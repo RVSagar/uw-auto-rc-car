@@ -20,13 +20,31 @@ mit-racecar/racecar_gazebo
   <cylinder length="0.05" radius="0.1" />
 </xacro:property>
 
-<xacro:property name="wheel_inertia">
+<xacro:property name="chassis_inertia">
    <inertial>
      <origin xyz="0 0 0" rpy="0 0 0"/>
      <mass value="100"/>
+     <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="10" />
+   </inertial>
+</xacro:property>
+
+<xacro:property name="wheel_inertia">
+   <inertial>
+     <origin xyz="0 0 0" rpy="0 0 0"/>
+     <mass value="1"/>
      <inertia ixx="10"  ixy="0"  ixz="0" iyy="10" iyz="0" izz="1" />
    </inertial>
 </xacro:property>
+
+<xacro:macro name="wheel_params" params="link">
+    <gazebo reference="${link}">
+        <mu1 value="1.0"/>
+        <mu2 value="1.0"/>
+        <kp  value="10000000.0" />
+        <kd  value="2.0" />
+        <material>Gazebo/Black</material>
+    </gazebo>
+</xacro:macro>
 
 <xacro:macro name="wheel_transmission" params="name">
   <transmission name="${name}_transmission" type="SimpleTransmission">
@@ -54,15 +72,7 @@ mit-racecar/racecar_gazebo
   </transmission>
 </xacro:macro>
 
-<xacro:macro name="wheel_params" params="link">
-    <gazebo reference="${link}">
-        <mu1 value="1.0"/>
-        <mu2 value="1.0"/>
-        <kp  value="10000000.0" />
-        <kd  value="2.0" />
-        <material>Gazebo/Black</material>
-    </gazebo>
-</xacro:macro>
+
 
 <link name="base_link"/>
 
@@ -82,11 +92,7 @@ mit-racecar/racecar_gazebo
             <color rgba="0 1.0 1.0 1.0"/>
         </material>
    </visual>
-   <inertial>
-     <origin xyz="0 0 0" rpy="0 0 0"/>
-     <mass value="100"/>
-     <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="10" />
-   </inertial>
+    <xacro:insert_block name="chassis_inertia" />
    <collision>
      <origin xyz="0 0 0" rpy="0 0 0"/>
      <geometry>
@@ -181,7 +187,7 @@ mit-racecar/racecar_gazebo
      </geometry>
    </collision>
 </link>
-
+<xacro:wheel_transmission name="right_front_wheel" />
 
 
 <joint name="right_front_wheel_joint" type="continuous">
@@ -242,6 +248,95 @@ mit-racecar/racecar_gazebo
     <broadcastTF>false</broadcastTF>
   </plugin>
 </gazebo>
+
+
+<joint name="hoyuko_fixed_joint" type="fixed">
+    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+    <parent link="chassis_link"/>
+    <child link="hoyuko_laser_link"/>
+    <axis xyz="0 0 1" />
+</joint>
+<link name="hoyuko_laser_link">
+   <inertial>
+     <origin xyz="0 0 0" rpy="0 0 0"/>
+     <mass value="1"/>
+     <inertia ixx="10"  ixy="0"  ixz="0" iyy="10" iyz="0" izz="1" />
+   </inertial>
+</link>
+
+<xacro:unless value="$(optenv DISABLE_GAZEBO_LASER false)">
+  <gazebo reference="hoyuko_laser_link">
+    <material>Gazebo/Grey</material>
+    <sensor type="ray" name="hokuyo_sensor">
+      <pose>0 0 0.0124 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>1081</samples>
+            <resolution>1</resolution>
+            <min_angle>-2.3561944902</min_angle>
+            <max_angle>2.3561944902</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.1</min>
+          <max>10.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>racecar/out/laser_scan</topicName>
+        <frameName>hoyuko_laser_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+</xacro:unless>
+
+<xacro:unless value="$(optenv DISABLE_GAZEBO_CAMERA false)">
+  <gazebo reference="hoyuko_laser_link">
+    <sensor type="camera" name="camera">
+      <update_rate>30.0</update_rate>
+      <!-- math.atan(320 / 687.8065795898438) * 2 -->
+      <camera name="camera">
+        <horizontal_fov>0.8709216071359963</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>B8G8R8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>30.0</updateRate>
+        <cameraName>/camera/zed</cameraName>
+        <imageTopicName>rgb/image_rect_color</imageTopicName>
+        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+        <frameName>hoyuko_laser_link</frameName>
+        <hackBaseline>0</hackBaseline><!-- set this to 0.12 for the second camera -->
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+</xacro:unless>
 
 
 </robot>
