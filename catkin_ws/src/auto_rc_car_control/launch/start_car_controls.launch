@@ -1,0 +1,9 @@
+<launch>
+    <rosparam  command="load" file="$(find auto_rc_car_control)/config/auto_rc_car_controls.yaml"/>
+    <node name="controller_spawner"
+          pkg="controller_manager"
+          type="spawner"
+          ns="racecar/internal"
+          output="screen"
+          args="joint_state_controller"/>
+</launch>
