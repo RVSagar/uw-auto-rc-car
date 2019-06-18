@@ -68,5 +68,5 @@ else
 	su -l $LOCAL_USER_NAME
 fi
 
-source /opt/ros/kinetic/setup.bash
+
 exec "$@"

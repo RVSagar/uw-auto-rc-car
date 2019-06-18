@@ -51,13 +51,15 @@ if ! docker container ps | grep -q ${CONTAINER_NAME}; then
 	$DOCKER_GPU_ARGS \
 	$DOCKER_SSH_AUTH_ARGS \
 	-v "$DIR:/home/${USER}" \
+	-v="/dev:/dev" \
+	-v="/etc/udev:/etc/udev" \
 	$ADDITIONAL_FLAGS --user root \
 	--name ${CONTAINER_NAME} --workdir /home/$USER \
 	--cap-add=SYS_PTRACE \
 	--cap-add=SYS_NICE \
 	--net host \
 	--device /dev/bus/usb \
-	$IMAGE_NAME 
+	$IMAGE_NAME bash
 else
 	echo "Starting shell in running container"
 	docker exec -it --workdir /home/${USER} --user $(whoami) ${CONTAINER_NAME} bash -l -c "stty cols $(tput cols); stty rows $(tput lines); bash"
