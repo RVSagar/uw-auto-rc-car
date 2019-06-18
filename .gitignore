@@ -16,3 +16,4 @@ catkin_ws/.catkin_workspace
 .ros
 .rviz
 .sdformat
+.viminfo
