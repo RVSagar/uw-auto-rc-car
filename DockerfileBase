@@ -25,6 +25,7 @@ RUN apt-get update && \
       python-catkin-tools \
       ros-kinetic-gazebo-ros-pkgs \
       ros-kinetic-gazebo-ros-control \
+      ros-kinetic-joint-state-controller \
       ros-kinetic-teleop-twist-keyboard \
       ros-kinetic-rviz && \
     rm -rf /var/lib/apt/lists/*
