@@ -50,6 +50,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # setup entrypoint
-COPY ./docker_entrypoint.sh /
+COPY ./docker/docker_entrypoint.sh /
 ENTRYPOINT ["/docker_entrypoint.sh"]
 CMD ["bash"]
