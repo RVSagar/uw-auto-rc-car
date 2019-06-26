@@ -6,4 +6,4 @@ then
 fi
 
 export ROS_MASTER_URI=http://$1:11311
-export ROS_IP=0.0.0.0
+export ROS_IP=172.27.0.1
