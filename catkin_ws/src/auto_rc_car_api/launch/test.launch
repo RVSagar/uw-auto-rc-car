@@ -1,0 +1,5 @@
+<launch>
+
+    <node name="core" pkg="auto_rc_car_api" type="car_core_node.py" output="screen"/>
+    <node name="client" pkg="auto_rc_car_api" type="client.py" output="screen"/>
+</launch>
