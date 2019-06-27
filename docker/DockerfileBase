@@ -16,6 +16,9 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
       vim \
       gedit \
       sudo \
+      net-tools\
+      dnsutils\
+      iputils-ping\
       git-all && \
     rm -rf /var/lib/apt/lists/*
 
