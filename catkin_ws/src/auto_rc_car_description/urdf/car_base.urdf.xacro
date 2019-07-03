@@ -264,6 +264,20 @@ mit-racecar/racecar_gazebo
    </inertial>
 </link>
 
+<joint name="kinect_fixed_joint" type="fixed">
+    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+    <parent link="chassis_link"/>
+    <child link="kinect_link"/>
+    <axis xyz="0 0 1" />
+</joint>
+<link name="kinect_link">
+   <inertial>
+     <origin xyz="0 0 0" rpy="0 0 0"/>
+     <mass value="1"/>
+     <inertia ixx="10"  ixy="0"  ixz="0" iyy="10" iyz="0" izz="1" />
+   </inertial>
+</link>
+
 <xacro:unless value="$(optenv DISABLE_GAZEBO_LASER false)">
   <gazebo reference="hoyuko_laser_link">
     <material>Gazebo/Grey</material>
@@ -298,45 +312,61 @@ mit-racecar/racecar_gazebo
   </gazebo>
 </xacro:unless>
 
-<xacro:unless value="$(optenv DISABLE_GAZEBO_CAMERA false)">
-  <gazebo reference="hoyuko_laser_link">
-    <sensor type="camera" name="camera">
-      <update_rate>30.0</update_rate>
-      <!-- math.atan(320 / 687.8065795898438) * 2 -->
-      <camera name="camera">
-        <horizontal_fov>0.8709216071359963</horizontal_fov>
-        <image>
-          <width>640</width>
-          <height>480</height>
-          <format>B8G8R8</format>
-        </image>
-        <clip>
-          <near>0.02</near>
-          <far>300</far>
-        </clip>
-        <noise>
-          <type>gaussian</type>
-          <mean>0.0</mean>
-          <stddev>0.007</stddev>
-        </noise>
-      </camera>
-      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>30.0</updateRate>
-        <cameraName>/camera/zed</cameraName>
-        <imageTopicName>rgb/image_rect_color</imageTopicName>
-        <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
-        <frameName>hoyuko_laser_link</frameName>
-        <hackBaseline>0</hackBaseline><!-- set this to 0.12 for the second camera -->
-        <distortionK1>0.0</distortionK1>
-        <distortionK2>0.0</distortionK2>
-        <distortionK3>0.0</distortionK3>
-        <distortionT1>0.0</distortionT1>
-        <distortionT2>0.0</distortionT2>
-      </plugin>
+
+  <joint name="camera_optical_joint" type="fixed">
+    <!-- these values have to be these values otherwise the gazebo camera
+        image won't be aligned properly with the frame it is supposedly
+        originating from -->
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+    <parent link="kinect_link"/>
+    <child link="camera_link_optical"/>
+  </joint>
+
+  <link name="camera_link_optical">
+  </link>
+
+  <gazebo reference="kinect_link">
+        <sensor name="camera" type="depth">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>true</visualize>
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.047198</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>3</far>
+          </clip>
+        </camera>
+    <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+      <baseline>0.2</baseline>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>30.0</updateRate>
+      <cameraName>sim_depth_camera</cameraName>
+      <imageTopicName>/racecar/out/stereo_camera/rgb/image</imageTopicName>
+      <cameraInfoTopicName>/racecar/out/stereo_camera/rgb/camera_info</cameraInfoTopicName>
+      <depthImageTopicName>/racecar/out/stereo_camera/depth/image</depthImageTopicName>
+      <depthImageInfoTopicName>/racecar/out/stereo_camera/depth/camera_info</depthImageInfoTopicName>
+      <pointCloudTopicName>/racecar/out/stereo_camera/depth_cloud/points</pointCloudTopicName>
+      <frameName>camera_link_optical</frameName>
+      <pointCloudCutoff>0.05</pointCloudCutoff>
+      <distortionK1>0</distortionK1>
+      <distortionK2>0</distortionK2>
+      <distortionK3>0</distortionK3>
+      <distortionT1>0</distortionT1>
+      <distortionT2>0</distortionT2>
+      <CxPrime>0</CxPrime>
+      <Cx>0</Cx>
+      <Cy>0</Cy>
+      <focalLength>0</focalLength>
+      <hackBaseline>0</hackBaseline>
+    </plugin>
     </sensor>
-  </gazebo>
-</xacro:unless>
+    </gazebo>
 
 
 </robot>
