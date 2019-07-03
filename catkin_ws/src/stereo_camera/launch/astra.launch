@@ -1,0 +1,7 @@
+<launch>
+
+    <include file="$(find astra_launch)/launch/astra.launch"/>
+
+    <node name="rgb_cam" pkg="libuvc_camera" type="camera_node"/>
+
+</launch>
