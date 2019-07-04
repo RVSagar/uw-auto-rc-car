@@ -3,6 +3,7 @@ import rospy
 
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import PointCloud2
 
 from geometry_msgs.msg import Twist
 
@@ -41,9 +42,17 @@ class AutoRCCar:
         self.lidar = RawDataModule(rospy,
                                    '/racecar/out/laser_scan', LaserScan,
                                    'racecar_api/lidar', carLidar, carLidarResponse)
-        self.camera = RawDataModule(rospy,
-                                   '/camera/zed/rgb/image_rect_color', Image,
-                                   'racecar_api/camera', carCamera, carCameraResponse)
+        self.camera_rgb = RawDataModule(rospy,
+                                   '/racecar/out/stereo_camera/rgb/image', Image,
+                                   'racecar_api/camera/rgb', carCamera, carCameraResponse)
+
+        self.camera_depth = RawDataModule(rospy,
+                                   '/racecar/out/stereo_camera/depth/image', Image,
+                                   'racecar_api/camera/depth', carCamera, carCameraResponse)
+
+        self.camera_cloud = RawDataModule(rospy,
+                                   '/racecar/out/stereo_camera/depth_cloud/points', PointCloud2,
+                                   'racecar_api/camera/cloud', carCamera, carCameraResponse)
 
         self.controls = RawDataModule(rospy,
                                       '/racecar/api_internal/control', carSteering,

@@ -20,9 +20,17 @@ class AutoRCCarClient:
         rospy.wait_for_service(lidar_topic)
         self.lidar_srv = rospy.ServiceProxy('/racecar_api/lidar', carLidar)
 
-        camera_topic = '/racecar_api/camera'
-        rospy.wait_for_service(camera_topic)
-        self.camera_srv = rospy.ServiceProxy(camera_topic, carCamera)
+        camera_rgb_topic = '/racecar_api/camera/rgb'
+        rospy.wait_for_service(camera_rgb_topic)
+        self.camera_rgb_srv = rospy.ServiceProxy(camera_rgb_topic, carCamera)
+
+        camera_depth_topic = '/racecar_api/camera/depth'
+        rospy.wait_for_service(camera_depth_topic)
+        self.camera_depth_srv = rospy.ServiceProxy(camera_depth_topic, carCamera)
+
+        camera_cloud_topic = '/racecar_api/camera/rgb'
+        rospy.wait_for_service(camera_cloud_topic)
+        self.camera_cloud_srv = rospy.ServiceProxy(camera_cloud_topic, carCamera)
 
         control_topic = '/racecar_api/last_control'
         rospy.wait_for_service(control_topic)
@@ -36,9 +44,17 @@ class AutoRCCarClient:
         data, dt = self.timed_service(self.lidar_srv)
         return data.lidar, dt
 
-    def get_latest_camera(self):
-        data, dt = self.timed_service(self.camera_srv)
+    def get_latest_camera_rgb(self):
+        data, dt = self.timed_service(self.camera_rgb_srv)
         return data.camera, dt
+
+    def get_latest_camera_depth(self):
+        data, dt = self.timed_service(self.camera_depth_srv)
+        return data.camera, dt
+
+    def get_latest_camera_cloud(self):
+        data, dt = self.timed_service(self.camera_cloud_srv)
+        return data.cloud, dt
 
     def get_latest_controls(self):
         data, dt = self.timed_service(self.control_srv)
@@ -65,6 +81,9 @@ class AutoRCCarClient:
 
     def get_time(self):
         return rospy.Time.now()
+
+    def software_sleep(self, dt):
+        rospy.sleep(dt)
 
 
 if __name__ == "__main__":
