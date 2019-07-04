@@ -1,0 +1,13 @@
+material CircleTrackImageMaterial{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture circle_track_image.jpg
+                scale 1 1
+            }
+        }   
+    }
+}

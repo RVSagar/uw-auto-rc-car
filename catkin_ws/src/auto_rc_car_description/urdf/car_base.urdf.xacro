@@ -339,7 +339,7 @@ mit-racecar/racecar_gazebo
           </image>
           <clip>
             <near>0.05</near>
-            <far>3</far>
+            <far>8</far>
           </clip>
         </camera>
     <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">

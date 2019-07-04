@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<robot name="circle_track">
+
+
+<link name="world" />
+<joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="circle_base_link"/>
+</joint>
+
+<link name="circle_base_link">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="15 15 0.01" />
+        </geometry>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="15 15 0.01" />
+        </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="10000"/>
+      <inertia
+        ixx="10000.0" ixy="0.0" ixz="0.0"
+        iyy="10000.0" iyz="0.0"
+        izz="10000.0"/>
+    </inertial>
+</link>
+
+
+<gazebo reference="circle_base_link">
+    <material>CircleTrackImageMaterial</material>
+</gazebo>
+
+
+</robot>
