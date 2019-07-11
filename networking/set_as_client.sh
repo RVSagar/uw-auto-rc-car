@@ -4,7 +4,7 @@ if [ -z "$1" ]
 then
       echo "Please call with the MASTER URI as an argument: ./set_as_client.sh xxx.yyy.zzz.www"
       echo "Use IP used as ROS_IP when running set_as_master.sh on master"
-      exit
+      return 0
 fi
 
 MASTER_IP=$1
