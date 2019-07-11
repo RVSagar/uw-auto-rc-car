@@ -1,6 +1,6 @@
 <launch>
 
-<include file="$(find rplidar_ros)/launch">
+<include file="$(find rplidar_ros)/launch/rplidar.launch">
   <remap from="/scan" to="/racecar/out/laser_scan"/>
 </include>
 
