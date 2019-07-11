@@ -11,6 +11,7 @@ if __name__ == "__main__":
     print("Starting")
     dist = 0
     threshold = 25
+    speed = 0.25
 
     while not rospy.is_shutdown():
         
@@ -25,20 +26,21 @@ if __name__ == "__main__":
         data = "Dist = %f     Data Transfer Time = %f" % (dist, dt)
 
 
-        _, thresh = cv2.threshold(img, threshold, 255, cv2.THRESH_BINARY_INV)
+        #_, thresh = cv2.threshold(img, threshold, 255, cv2.THRESH_BINARY_INV)
 
-        rows, cols, _ = thresh.shape
+        rows, cols, _ = img.shape
         count = 0
         totX = 0
-        for x in range(0, cols):
-            for y in range(int(rows/2.5), rows):
-                b,g,r = thresh[y, x]
+        for y in range(int(rows/2.5), rows):
+            for x in range(0, cols):
+            
+                b,g,r = img[y, x]
                 
-                if b == 255:
+                if b < threshold and g < threshold and r < threshold:
                     count += 1
                     totX += x
 
-        centroid_x = totX / (count + 1);
+        centroid_x = int(totX / (count + 1));
 
 
         cv2.putText(img, data, (0,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0))
@@ -46,9 +48,9 @@ if __name__ == "__main__":
         cv2.imshow("Car Camera", img)
         cv2.waitKey(25)
 
-        control = -2.0*(centroid_x - (cols/2.0))/cols
+        control = -0.5*(centroid_x - (cols/2.0))/cols
         print(control)
 
-        car.send_control(0.3, control)
+        car.send_control(speed, control)
 
     car.send_control(0, 0)

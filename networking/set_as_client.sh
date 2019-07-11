@@ -3,13 +3,13 @@
 if [ -z "$1" ]
 then
       echo "Please call with the MASTER URI as an argument: ./set_as_client.sh xxx.yyy.zzz.www"
-      #return
+      echo "Use IP used as ROS_IP when running set_as_master.sh on master"
+      exit
 fi
 
 MASTER_IP=$1
-#MASTER_IP=129.97.229.135
+echo "Using ROS_MASTER_URI -> ${MASTER_IP}"
 export ROS_MASTER_URI=http://$MASTER_IP:11311
-#export ROS_IP=172.27.0.1
 
 LIST=(`hostname -I`)
 echo "Full hostname IP list: $LIST"
