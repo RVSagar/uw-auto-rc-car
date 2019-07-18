@@ -1,5 +1,16 @@
 <launch>
-    <include file="$(find auto_rc_car_gazebo)/launch/circle_track_demo.launch"/>
+    <!--name of gazebo launch file, without '_world.launch'-->
+    <arg name="world_name" default="circle_track"/>
+    <arg name="viz_type" default="local"/>
+
+    <include file="$(find auto_rc_car_worlds)/launch/$(arg world_name)_world.launch"/>
+
+    <include file="$(find auto_rc_car_description)/launch/viz_car_$(arg viz_type).launch"/>
+
+    <include file="$(find auto_rc_car_gazebo)/launch/basic_demo.launch"/>
     <node name="core" pkg="auto_rc_car_api" type="car_core_node.py" output="screen"/>
+
     <!--<node name="client" pkg="auto_rc_car_demos" type="simple_lane_drive.py" output="screen"/>-->
+
+
 </launch>

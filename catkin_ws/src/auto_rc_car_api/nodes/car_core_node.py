@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 import rospy
 
+from std_msgs.msg import Float64
+
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
@@ -59,17 +61,19 @@ class AutoRCCar:
                                       'racecar_api/last_control', carControls, carControlsResponse)
 
         self.control_sub = rospy.Subscriber('/racecar/api_internal/control', carSteering, self.control_cb)
-        self.control_pup = rospy.Publisher('/racecar/in/cmd_vel', Twist, queue_size=3)
+        self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
+        self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
 
-        #self.laser_scan = None
-        #self.laser_scan_sub = rospy.Subscriber('/racecar/out/laser_scan', LaserScan, self.laser_scan_cb)
-        #self.laser_scan_service = rospy.Service('/racecar_api/lidar', Lidar, self.laser_scan_service_cb)
 
     def control_cb(self, msg):
-        cmd = Twist()
-        cmd.linear.x = msg.speed
-        cmd.angular.z = msg.steer
-        self.control_pup.publish(cmd)
+        speed = Float64()
+        speed.data = msg.speed
+
+        steer = Float64()
+        steer.data = msg.steer
+
+        self.steer_pub.publish(steer)
+        self.speed_pub.publish(speed)
 
 
     def run(self):

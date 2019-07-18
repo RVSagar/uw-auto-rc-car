@@ -1,0 +1,4 @@
+<launch>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find auto_rc_car_description)/config/car_viz_global.rviz" required="true" />
+  <node name="m2tf" pkg="message_to_tf" type="message_to_tf" args="/racecar/internal/sim_only/global_pos"/>
+</launch>

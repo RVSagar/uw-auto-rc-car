@@ -1,0 +1,14 @@
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="worlds/empty.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <param name="track_description" command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/concave_track.xacro.urdf" />
+  <node name="spawn_track_urdf" pkg="gazebo_ros" type="spawn_model" args="-param track_description -x 0.0 -y -3.0 -z 0.00 -Y 1.57 -urdf -model circle_track --verbose" respawn="false" output="screen"/>
+</launch>

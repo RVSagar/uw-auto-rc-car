@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<robot name="concave_track" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:property name="size" value="50.0" />
+
+<link name="world" />
+<joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="track_base_link"/>
+</joint>
+
+<link name="track_base_link">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${size} ${size} 0.01" />
+        </geometry>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${size} ${size} 0.01" />
+        </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="10000"/>
+      <inertia
+        ixx="10000.0" ixy="0.0" ixz="0.0"
+        iyy="10000.0" iyz="0.0"
+        izz="10000.0"/>
+    </inertial>
+</link>
+
+
+<gazebo reference="track_base_link">
+    <material>ConcaveTrackImageMaterial</material>
+    <static>true</static>
+</gazebo>
+
+<gazebo>
+    <static>true</static>
+</gazebo>
+
+
+</robot>

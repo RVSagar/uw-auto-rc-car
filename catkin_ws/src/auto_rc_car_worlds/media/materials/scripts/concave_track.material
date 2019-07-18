@@ -1,0 +1,13 @@
+material ConcaveTrackImageMaterial{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture concave_track_image.jpg
+                scale 1 1
+            }
+        }   
+    }
+}

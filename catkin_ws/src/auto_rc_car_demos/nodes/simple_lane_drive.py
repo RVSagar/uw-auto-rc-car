@@ -2,6 +2,7 @@
 import rospy
 import numpy as np
 import cv2
+import math
 
 from auto_rc_car_api.client import AutoRCCarClient
 
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     dist = 0
 
     threshold = 25
-    speed = 0.25
+    base_speed = 15.0
 
     while not rospy.is_shutdown():
         
@@ -44,8 +45,10 @@ if __name__ == "__main__":
         cv2.imshow("Car Camera", img)
         cv2.waitKey(25)
 
-        control = -0.5*(centroid_x - (cols/2.0))/cols
-        print(control)
+        control = -1.5*(centroid_x - (cols/2.0))/cols
+        speed = base_speed / (20.0 * control*control + 1.0)
+ 
+        print("%f \t at \t %f" % (control, speed))
 
         car.send_control(speed, control)
 
