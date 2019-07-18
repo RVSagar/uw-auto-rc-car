@@ -3,7 +3,7 @@
 
 
 <link name="world" />
-<joint name="world_joint" type="fixed">
+<joint name="fixed" type="fixed">
     <parent link="world"/>
     <child link="circle_base_link"/>
 </joint>
@@ -34,6 +34,11 @@
 
 <gazebo reference="circle_base_link">
     <material>CircleTrackImageMaterial</material>
+    <static>true</static>
+</gazebo>
+
+<gazebo>
+    <static>true</static>
 </gazebo>
 
 
