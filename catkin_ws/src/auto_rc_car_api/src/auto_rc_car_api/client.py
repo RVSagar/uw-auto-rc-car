@@ -12,33 +12,33 @@ import cv2
 class AutoRCCarClient:
 
     def __init__(self):
-
         rospy.init_node('rc_car_client')
-        rospy.sleep(0.5)
+        print("Starting Client")
 
         lidar_topic = '/racecar_api/lidar'
         rospy.wait_for_service(lidar_topic)
         self.lidar_srv = rospy.ServiceProxy('/racecar_api/lidar', carLidar)
 
         camera_rgb_topic = '/racecar_api/camera/rgb'
-        rospy.wait_for_service(camera_rgb_topic)
+        #rospy.wait_for_service(camera_rgb_topic)
         self.camera_rgb_srv = rospy.ServiceProxy(camera_rgb_topic, carCamera)
 
         camera_depth_topic = '/racecar_api/camera/depth'
-        rospy.wait_for_service(camera_depth_topic)
+        #rospy.wait_for_service(camera_depth_topic)
         self.camera_depth_srv = rospy.ServiceProxy(camera_depth_topic, carCamera)
 
         camera_cloud_topic = '/racecar_api/camera/rgb'
-        rospy.wait_for_service(camera_cloud_topic)
+        #rospy.wait_for_service(camera_cloud_topic)
         self.camera_cloud_srv = rospy.ServiceProxy(camera_cloud_topic, carCamera)
 
         control_topic = '/racecar_api/last_control'
-        rospy.wait_for_service(control_topic)
+        #rospy.wait_for_service(control_topic)
         self.control_srv = rospy.ServiceProxy(control_topic, carControls)
 
         send_control_topic = '/racecar/api_internal/control'
         self.control_pub = rospy.Publisher(send_control_topic, carSteering, queue_size=3)
 
+        print("Client Initialized")
 
     def get_latest_lidar(self):
         data, dt = self.timed_service(self.lidar_srv)
