@@ -1,0 +1,10 @@
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+# Position Controllers ---------------------------------------
+stoplight_controller:
+  joint: light_joint
+  type: effort_controllers/JointPositionController
+  pid: {p: 5.0, i: 0.0, d: 5}
