@@ -31,7 +31,7 @@ RUN apt-get update && \
       ros-kinetic-joint-state-controller \
       ros-kinetic-teleop-twist-keyboard \
       ros-kinetic-effort-controllers \
-      ros-kinetic-message_to_tf \
+      ros-kinetic-message-to-tf \
       ros-kinetic-rviz && \
     rm -rf /var/lib/apt/lists/*
 
