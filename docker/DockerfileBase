@@ -16,6 +16,7 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
       vim \
       gedit \
       sudo \
+      python-pip \
       net-tools\
       dnsutils\
       iputils-ping\
@@ -32,6 +33,7 @@ RUN apt-get update && \
       ros-kinetic-teleop-twist-keyboard \
       ros-kinetic-effort-controllers \
       ros-kinetic-message-to-tf \
+      ros-kinetic-rplidar-ros \
       ros-kinetic-rviz && \
     rm -rf /var/lib/apt/lists/*
 

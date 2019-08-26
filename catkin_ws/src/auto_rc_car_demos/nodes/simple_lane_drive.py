@@ -111,6 +111,28 @@ def detect_sign(img):
     return 'n', 0
 
 
+def lidar_gen_distance_in_range(scan, th1, th2):
+    if th2 < th1:
+        temp = th1
+        th1 = th2
+        th2 = th1
+    
+    th1 = max(th1, scan.angle_min)
+    th2 = min(th2, scan.angle_max)
+
+    ind_start = int((th1 - scan.angle_min) / scan.angle_increment)
+    ind_end = int((th2 - scan.angle_min) / scan.angle_increment)
+
+    meas = scan.ranges[ind_start:ind_end]
+    meas = [m for m in meas if np.isfinite(m)]
+
+    if len(meas) == 0:
+        return -1
+
+    return 0.5 * (min(meas) + np.mean(meas)) - np.std(meas)
+
+
+
 if __name__ == "__main__":
     car = AutoRCCarClient()
     
@@ -124,6 +146,7 @@ if __name__ == "__main__":
         
         img, dt = car.get_latest_camera_rgb()
         img = car.camera_to_cv_image(img)
+        lidar, dt2 = car.get_latest_lidar()
 
         dt_speed_scale = 1.0 / (1 + 50* dt)
         
@@ -144,17 +167,39 @@ if __name__ == "__main__":
 
         data = "Dist = %f     Data Transfer Time = %f" % (dist, dt)
         cv2.putText(img, data, (0,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0))
+
+
+        lidar_front_speed_scale = 1.0
+        lidar_left_speed_scale = 1.0
+        lidar_right_speed_scale = 1.0
+
+        dist_front = lidar_gen_distance_in_range(lidar, -0.3, 0.3)
+        if dist_front > 0 and dist_front < 1.5:
+            lidar_front_speed_scale = 0.0
+        
+        dist_left = lidar_gen_distance_in_range(lidar, 0.6, 3.14)
+        if dist_left > 0 and dist_left < 1.0:
+            lidar_left_speed_scale = 0.5
+
+        dist_right = lidar_gen_distance_in_range(lidar, -3.14, -0.6)
+        if dist_right > 0 and dist_right < 1.0:
+            lidar_right_speed_scale = 0.5
+        
+        lidar_speed_scale = lidar_front_speed_scale * lidar_left_speed_scale * lidar_right_speed_scale
         
 
         control = -1.5*(centroid_x - (cols/2.0))/cols
         steer_speed_scale = 1.0 / (20.0 * control*control + 1.0)
-        speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale
+        speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
  
         print("dt=%f" % dt)
         print("speed=%f" % speed)
         print("steer=%f" % control)
         print("c=%s" % c)
         print("c_mag=%f" % c_mag)
+        print("dist_front=%f" % dist_front)
+        print("dist_left=%f" % dist_left)
+        print("dist_right=%f" % dist_right)
         print("")
 
         car.send_control(speed, control)
