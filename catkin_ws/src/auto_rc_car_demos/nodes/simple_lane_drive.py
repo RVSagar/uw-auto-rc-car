@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import math
 
-from auto_rc_car_api.clients import AutoRCCarClientRemote, AutoRCCarClientLocal
+from auto_rc_car_api.clients import CreateRCCar
 
 
 def get_black_centroid(img):
@@ -134,8 +134,7 @@ def lidar_gen_distance_in_range(scan, th1, th2):
 
 
 if __name__ == "__main__":
-    #car = AutoRCCarClientRemote()
-    car = AutoRCCarClientLocal()
+    car = CreateRCCar()
     
     print("Starting")
     dist = 0

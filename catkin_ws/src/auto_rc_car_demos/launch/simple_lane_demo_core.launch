@@ -15,6 +15,11 @@
     <!--<node name="client" pkg="auto_rc_car_demos" type="simple_lane_drive.py" output="screen"/>-->
     <group if="$(arg run_as_remote)">
         <node name="core" pkg="auto_rc_car_api" type="car_core_node.py" output="screen" />
+        <param name="client_comm_type" value="remote"/>
+    </group>
+    
+    <group unless="$(arg run_as_remote)">
+        <param name="client_comm_type" value="local"/>
     </group>
 
 </launch>

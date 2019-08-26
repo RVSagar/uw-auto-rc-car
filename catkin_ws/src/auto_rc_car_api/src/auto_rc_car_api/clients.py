@@ -101,3 +101,13 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         self.control_pub.publish(msg)
         self.steer_pub.publish(Float64(steer))
         self.speed_pub.publish(Float64(speed))
+
+def CreateRCCar():
+    client_type = rospy.get_param('/client_comm_type', 'remote')
+
+    if client_type == 'remote':
+        return AutoRCCarClientRemote()
+    if client_type == 'local':
+        return AutoRCCarClientLocal()
+    
+    raise Exception("Client comm type not found, or does not match available types")
