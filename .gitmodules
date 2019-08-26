@@ -1,3 +1,6 @@
 [submodule "catkin_ws/src/rplidar_ros"]
 	path = catkin_ws/src/rplidar_ros
 	url = https://github.com/slamtec/rplidar_ros
+[submodule "catkin_ws/src/vesc"]
+	path = catkin_ws/src/vesc
+	url = https://github.com/erwincoumans/vesc.git
