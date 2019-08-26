@@ -15,7 +15,7 @@ from auto_rc_car_api.srv import carControls, carControlsResponse
 from auto_rc_car_api.msg import carSteering
 
 
-class RawDataModule:
+class RemoteDataModule:
     def __init__(self, rospy,
                  msg_topic, msg_type,
                  srv_topic, srv_type, srv_return_type):
@@ -35,28 +35,30 @@ class RawDataModule:
     def srv_cb(self, msg):
         return self.srv_return_type(self.data)
 
-class AutoRCCar:
+
+class AutoRCCarRemoteCore:
 
     def __init__(self):
 
         rospy.init_node('rc_car_core')
+        print("Initializing Remote Core Node!")
 
-        self.lidar = RawDataModule(rospy,
+        self.lidar = RemoteDataModule(rospy,
                                    '/racecar/out/laser_scan', LaserScan,
                                    'racecar_api/lidar', carLidar, carLidarResponse)
-        self.camera_rgb = RawDataModule(rospy,
+        self.camera_rgb = RemoteDataModule(rospy,
                                    '/racecar/out/stereo_camera/rgb/image', Image,
                                    'racecar_api/camera/rgb', carCamera, carCameraResponse)
 
-        self.camera_depth = RawDataModule(rospy,
+        self.camera_depth = RemoteDataModule(rospy,
                                    '/racecar/out/stereo_camera/depth/image', Image,
                                    'racecar_api/camera/depth', carCamera, carCameraResponse)
 
-        self.camera_cloud = RawDataModule(rospy,
+        self.camera_cloud = RemoteDataModule(rospy,
                                    '/racecar/out/stereo_camera/depth_cloud/points', PointCloud2,
                                    'racecar_api/camera/cloud', carCamera, carCameraResponse)
 
-        self.controls = RawDataModule(rospy,
+        self.controls = RemoteDataModule(rospy,
                                       '/racecar/api_internal/control', carSteering,
                                       'racecar_api/last_control', carControls, carControlsResponse)
 
@@ -82,5 +84,5 @@ class AutoRCCar:
 
 
 if __name__ == "__main__":
-    car = AutoRCCar()
+    car = AutoRCCarRemoteCore()
     car.run()

@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import math
 
-from auto_rc_car_api.client import AutoRCCarClient
+from auto_rc_car_api.clients import AutoRCCarClientRemote, AutoRCCarClientLocal
 
 
 def get_black_centroid(img):
@@ -134,7 +134,8 @@ def lidar_gen_distance_in_range(scan, th1, th2):
 
 
 if __name__ == "__main__":
-    car = AutoRCCarClient()
+    #car = AutoRCCarClientRemote()
+    car = AutoRCCarClientLocal()
     
     print("Starting")
     dist = 0
@@ -173,17 +174,23 @@ if __name__ == "__main__":
         lidar_left_speed_scale = 1.0
         lidar_right_speed_scale = 1.0
 
-        dist_front = lidar_gen_distance_in_range(lidar, -0.3, 0.3)
-        if dist_front > 0 and dist_front < 1.5:
-            lidar_front_speed_scale = 0.0
-        
-        dist_left = lidar_gen_distance_in_range(lidar, 0.6, 3.14)
-        if dist_left > 0 and dist_left < 1.0:
-            lidar_left_speed_scale = 0.5
+        dist_front = -2
+        dist_left = -2
+        dist_right = -2
+        try:
+            dist_front = lidar_gen_distance_in_range(lidar, -0.3, 0.3)
+            if dist_front > 0 and dist_front < 1.5:
+                lidar_front_speed_scale = 0.0
+            
+            dist_left = lidar_gen_distance_in_range(lidar, 0.6, 3.14)
+            if dist_left > 0 and dist_left < 1.0:
+                lidar_left_speed_scale = 0.5
 
-        dist_right = lidar_gen_distance_in_range(lidar, -3.14, -0.6)
-        if dist_right > 0 and dist_right < 1.0:
-            lidar_right_speed_scale = 0.5
+            dist_right = lidar_gen_distance_in_range(lidar, -3.14, -0.6)
+            if dist_right > 0 and dist_right < 1.0:
+                lidar_right_speed_scale = 0.5
+        except ZeroDivisionError as e:
+            print(e)
         
         lidar_speed_scale = lidar_front_speed_scale * lidar_left_speed_scale * lidar_right_speed_scale
         
