@@ -77,7 +77,7 @@ class AutoRCCarClientRemote(AutoRCCarClientBase):
 
 class AutoRCCarClientLocal(AutoRCCarClientBase):
 
-    def __init__(self):
+    def __init__(self, context):
         rospy.init_node('rc_car_client')
         print("Starting Client")
 
@@ -88,8 +88,13 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         self.controls = LocalDataModule(rospy, '/racecar/api_internal/control', carSteering)
 
         self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
-        self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
-        self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
+
+        if context == 'sim':
+            self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
+            self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
+        else:
+            self.steer_pub = rospy.Publisher('', Float64, queue_size=3)
+            self.speed_pub = rospy.Publisher('', Float64, queue_size=3)
 
 
         print("Client Initialized")
@@ -104,10 +109,11 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
 
 def CreateRCCar():
     client_type = rospy.get_param('/client_comm_type', 'remote')
+    context = rospy.get_param('/car_context', 'sim')
 
     if client_type == 'remote':
         return AutoRCCarClientRemote()
     if client_type == 'local':
-        return AutoRCCarClientLocal()
+        return AutoRCCarClientLocal(context)
     
     raise Exception("Client comm type not found, or does not match available types")
