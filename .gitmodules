@@ -4,3 +4,9 @@
 [submodule "catkin_ws/src/vesc"]
 	path = catkin_ws/src/vesc
 	url = https://github.com/erwincoumans/vesc.git
+[submodule "catkin_ws/src/ros_astra_camera"]
+	path = catkin_ws/src/ros_astra_camera
+	url = https://github.com/orbbec/ros_astra_camera.git
+[submodule "catkin_ws/src/ros_astra_launch"]
+	path = catkin_ws/src/ros_astra_launch
+	url = https://github.com/orbbec/ros_astra_launch.git

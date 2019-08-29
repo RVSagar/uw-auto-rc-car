@@ -39,7 +39,7 @@ def detect_sign(img):
     grey = grey[0:midr, midc:]
 
     circles = cv2.HoughCircles(grey, cv2.HOUGH_GRADIENT, 1, 25, param1=30, param2=18)
-    print(circles)
+    #print(circles)
 
     #cv2.imshow("Car Camera", grey)
     #cv2.waitKey(25)
@@ -56,8 +56,8 @@ def detect_sign(img):
         
         # draw the circle in the output image, then draw a rectangle
         # corresponding to the center of the circle
-        print("midr=%d"%midr)
-        print("midc=%d"%midc)
+        #print("midr=%d"%midr)
+        #print("midc=%d"%midc)
 
         x = midc+x0
         y = midr+y0
@@ -66,13 +66,13 @@ def detect_sign(img):
         i_low = x - sr
         i_high = x + sr
         if i_low < 0 or i_high >= cols:
-            print("i (%d, %d) out of range" % (i_low, i_high))
+            #print("i (%d, %d) out of range" % (i_low, i_high))
             continue
 
         j_low = y0 - sr
         j_high = y0 + sr
         if j_low < 0 or j_high >= rows:
-            print("j (%d, %d) out of range" % (j_low, j_high))
+            #print("j (%d, %d) out of range" % (j_low, j_high))
             continue
 
         cv2.circle(img, (x , y0), r, (0, 255, 0), 4)
@@ -87,7 +87,7 @@ def detect_sign(img):
                 color_acc = color_acc + color
                 count = count + 1.0
         color_acc = color_acc / count
-        print("avg_color: {}".format(color_acc))
+        #print("avg_color: {}".format(color_acc))
 
         b = color_acc[0]
         g = color_acc[1]
@@ -99,8 +99,8 @@ def detect_sign(img):
         r = r / tot
         g = g / tot
 
-        print("r=%f"%r)
-        print("g=%f"%g)
+        #print("r=%f"%r)
+        #print("g=%f"%g)
 
         if r > thresh:
             return 'r', r
@@ -156,9 +156,19 @@ if __name__ == "__main__":
             continue    
         rows, cols, _ = img.shape    
 
-        centroid_x = get_black_centroid(img)
+	print("Getting centroid for steering...")
+	img_size = img.shape
+	print(img_size)
+	img_scale = 0.5
+	newX = int(img_size[1]*img_scale)
+	newY = int(img_size[0]*img_scale)
+	img_red = cv2.resize(img, (newX, newY))
+        centroid_x = get_black_centroid(img_red)
+	print("  done")
 
-        c, c_mag = detect_sign(img)
+        c, c_mag = detect_sign(img_red)
+	#c = 'g'
+	#c_mag = -1
 
         if c == 'r':
             light_speed_scale = 0.0
@@ -197,6 +207,7 @@ if __name__ == "__main__":
         control = -1.5*(centroid_x - (cols/2.0))/cols
         steer_speed_scale = 1.0 / (20.0 * control*control + 1.0)
         speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
+
  
         print("dt=%f" % dt)
         print("speed=%f" % speed)
@@ -210,8 +221,8 @@ if __name__ == "__main__":
 
         car.send_control(speed, control)
 
-        cv2.imshow("Car Camera", img)
-        cv2.waitKey(25)
+        #cv2.imshow("Car Camera", img)
+        #cv2.waitKey(25)
 
     car.send_control(0, 0)
 
