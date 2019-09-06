@@ -7,11 +7,13 @@ import math
 from auto_rc_car_api.clients import CreateRCCar
 
 
-def get_black_centroid(img):
+def get_black_centroid(img, scaled_by):
     rows, cols, _ = img.shape
     count = 0
     totX = 0
-
+    
+    threshold = 20
+    num_thresh = 30 
     drop_bottom_rows = 20
 
     for y in range(int(rows/2.5), rows-drop_bottom_rows):
@@ -22,11 +24,13 @@ def get_black_centroid(img):
                 count += 1
                 totX += x
 
+    if totX < num_thresh:
+        centroid_x = int(cols / 2)
+    else:
+        centroid_x = int(totX / (count + 1))
     
-
-    centroid_x = int(totX / (count + 1))
     cv2.line(img, (centroid_x, 0), (centroid_x, rows), (0, 0, 255), 2)
-    return centroid_x
+    return int(centroid_x / scaled_by)
 
 def detect_sign(img):
     rows, cols, _ = img.shape
@@ -141,7 +145,7 @@ if __name__ == "__main__":
     print("Starting")
     dist = 0
 
-    threshold = 25
+    threshold = 15
     base_speed = 10.0
 
     while not rospy.is_shutdown():
@@ -165,7 +169,7 @@ if __name__ == "__main__":
 	newX = int(img_size[1]*img_scale)
 	newY = int(img_size[0]*img_scale)
 	img_red = cv2.resize(img, (newX, newY))
-        centroid_x = get_black_centroid(img_red)
+        centroid_x = get_black_centroid(img_red, scaled_by=0.5)
 	print("  done")
 
         c, c_mag = detect_sign(img_red)
@@ -216,18 +220,20 @@ if __name__ == "__main__":
             print(e)
         
         lidar_speed_scale = lidar_front_speed_scale * lidar_left_speed_scale * lidar_right_speed_scale
-        
-
-        centroid_percentage = (centroid_x - (cols/2.0))/cols
-        control = centroid_percentage
-        steer_speed_scale = 1.0 / (20.0 * control*control + 1.0)
+        # Is 0-1, should be From -1 to 1, Left to Right
+        centroid_percentage = (centroid_x / float(cols) - 0.25)*2.0 
+        centroid_percentage = (centroid_x / float(cols) - 0.5) * 2.0
+        #centroid_percentage = (centroid_x - (cols/2.0))/cols
+        control_ang = -centroid_percentage * 1.0
+        steer_speed_scale = 1.0 / (20.0 * control_ang*control_ang + 1.0)
         speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
 
  
         print("dt=%f" % dt)
         print("speed=%f" % speed)
-        print("steer=%f" % control)
-        print("black centroid=%f", centroid_percentage)
+        print("steer_ang=%f" % control_ang)
+        print("x_centroid=%f" % centroid_x)
+        print("black centroid=%f" % centroid_percentage)
         print("c=%s" % c)
         print("c_mag=%f" % c_mag)
         print("dist_front_left=%f" % dist_front_left)
@@ -236,8 +242,10 @@ if __name__ == "__main__":
         print("dist_right=%f" % dist_right)
         print("")
 
-        car.send_control(speed, control)
+        car.send_control(speed, control_ang)
 
+        
+        #cv2.line(img, (centroid_x, 0), (centroid_x, rows), (0, 0, 255), 2)
         #cv2.imshow("Car Camera", img)
         #cv2.waitKey(25)
 

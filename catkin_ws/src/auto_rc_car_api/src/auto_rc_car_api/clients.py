@@ -116,6 +116,12 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
             steer = -self.max_steer
         if steer > self.max_steer:
             steer = self.max_steer
+        
+        # Correct direction
+        steer = -steer
+        
+        # Transform to -1 to 1
+        steer = steer / self.max_steer
 
         # Transform to 0-1
         steer = steer/2.0 + 0.5
