@@ -111,6 +111,7 @@ def detect_sign(img):
     return 'n', 0
 
 
+
 def lidar_gen_distance_in_range(scan, th1, th2):
     if th2 < th1:
         temp = th1
@@ -185,6 +186,8 @@ if __name__ == "__main__":
         lidar_right_speed_scale = 1.0
 
         dist_front = -2
+        dist_front_left = -2
+        dist_front_right = -2
         dist_left = -2
         dist_right = -2
         try:
@@ -193,19 +196,19 @@ if __name__ == "__main__":
             dist_front_right = lidar_gen_distance_in_range(lidar, 3.14, 3.14-sweep)
 
             def dist_too_close(dist, close_limit):
-                if dst > 0 and dist < close_limit
+                if dist > 0 and dist < close_limit:
                     return True
                 return False
 
-            if dist_too_close(dist_front_left, 1.5) or dist_too_close(dist_front_right, 1.5):
+            if dist_too_close(dist_front_left, 0.5) or dist_too_close(dist_front_right, 0.5):
                 lidar_front_speed_scale = 0.0
             
             dist_left = lidar_gen_distance_in_range(lidar, -0.6, -3)
-            if dist_too_close(dist_left, 1.0):
+            if dist_too_close(dist_left, 0.25):
                 lidar_left_speed_scale = 0.5
 
             dist_right = lidar_gen_distance_in_range(lidar, 0.6, 3)
-            if dist_too_close(dist_right, 1.0):
+            if dist_too_close(dist_right, 0.25):
                 lidar_right_speed_scale = 0.5
 
         except ZeroDivisionError as e:
@@ -224,7 +227,8 @@ if __name__ == "__main__":
         print("steer=%f" % control)
         print("c=%s" % c)
         print("c_mag=%f" % c_mag)
-        print("dist_front=%f" % dist_front)
+        print("dist_front_left=%f" % dist_front_left)
+        print("dist_front_right=%f" % dist_front_right)
         print("dist_left=%f" % dist_left)
         print("dist_right=%f" % dist_right)
         print("")
