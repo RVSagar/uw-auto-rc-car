@@ -192,8 +192,9 @@ if __name__ == "__main__":
         dist_left = -2
         dist_right = -2
         try:
-            dist_front_left = lidar_gen_distance_in_range(lidar, -3.12, -3.12+0.3)
-            dist_front_right = lidar_gen_distance_in_range(lidar, 3.14-0.3, 3.14)
+            sweep = 0.5
+            dist_front_left = lidar_gen_distance_in_range(lidar, -3.12, -3.12+sweep)
+            dist_front_right = lidar_gen_distance_in_range(lidar, 3.14, 3.14-sweep)
 
             def dist_too_close(dist, close_limit):
                 if dist > 0 and dist < close_limit:
