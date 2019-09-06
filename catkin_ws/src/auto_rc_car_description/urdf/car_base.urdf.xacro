@@ -105,6 +105,15 @@ mit-racecar/racecar_gazebo
             <color rgba="0 1.0 1.0 1.0"/>
         </material>
    </visual>
+   <visual>
+        <origin xyz="0.15 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="0.08 0.08 0.08" />
+        </geometry>
+            <material name="Cyan">
+            <color rgba="0 1.0 1.0 1.0"/>
+        </material>
+   </visual>
     <xacro:insert_block name="chassis_inertia" />
    <collision>
      <origin xyz="0 0 0" rpy="0 0 0"/>
