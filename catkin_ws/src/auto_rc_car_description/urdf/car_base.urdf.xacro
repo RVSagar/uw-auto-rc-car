@@ -221,7 +221,7 @@ mit-racecar/racecar_gazebo
 
 
 <joint name="hoyuko_fixed_joint" type="fixed">
-    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+    <origin xyz="0 0 0.25" rpy="0 0 3.1415"/>
     <parent link="chassis_link"/>
     <child link="hoyuko_laser_link"/>
     <axis xyz="0 0 1" />

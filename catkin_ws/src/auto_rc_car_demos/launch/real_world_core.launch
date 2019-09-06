@@ -37,13 +37,17 @@
     <group if="$(arg run_as_remote)">
         <node name="core" pkg="auto_rc_car_api" type="car_core_node.py" output="screen" >
         	<remap from="/racecar/internal/speed_controller/command" to="/commands/motor/current"/>
-		<remap from="/racecar/internal/steering_controller/command" to="/commands/servo/position"/>
+		    <remap from="/racecar/internal/steering_controller/command" to="/commands/servo/position"/>
         </node>
         <param name="client_comm_type" value="remote"/>
     </group>
     
     <group unless="$(arg run_as_remote)">
         <param name="client_comm_type" value="local"/>
+        <node name="core" pkg="auto_rc_car_api" type="car_core_node.py" output="screen" >
+        	<remap from="/racecar/internal/speed_controller/command" to="/commands/motor/current"/>
+		    <remap from="/racecar/internal/steering_controller/command" to="/commands/servo/position"/>
+        </node>
     </group>
 
   <arg name="vesc_config" default="$(find auto_rc_car_api)/config/vesc.yaml" />
