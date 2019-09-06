@@ -188,8 +188,9 @@ if __name__ == "__main__":
         dist_left = -2
         dist_right = -2
         try:
-            dist_front_left = lidar_gen_distance_in_range(lidar, -3.12, -3.12+0.3)
-            dist_front_right = lidar_gen_distance_in_range(lidar, 3.14, -3.14-0.3)
+            sweep = 0.5
+            dist_front_left = lidar_gen_distance_in_range(lidar, -3.12, -3.12+sweep)
+            dist_front_right = lidar_gen_distance_in_range(lidar, 3.14, 3.14-sweep)
 
             def dist_too_close(dist, close_limit):
                 if dst > 0 and dist < close_limit
@@ -200,11 +201,11 @@ if __name__ == "__main__":
                 lidar_front_speed_scale = 0.0
             
             dist_left = lidar_gen_distance_in_range(lidar, -0.6, -3)
-            if dist_too_close(dist_left, 1.0)
+            if dist_too_close(dist_left, 1.0):
                 lidar_left_speed_scale = 0.5
 
             dist_right = lidar_gen_distance_in_range(lidar, 0.6, 3)
-            if dist_too_close(dist_right, 1.0)
+            if dist_too_close(dist_right, 1.0):
                 lidar_right_speed_scale = 0.5
 
         except ZeroDivisionError as e:
