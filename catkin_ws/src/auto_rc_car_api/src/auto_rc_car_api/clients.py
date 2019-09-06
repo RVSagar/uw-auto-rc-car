@@ -94,8 +94,8 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
             self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
             self.speed_K = 1.0
         else:
-            self.steer_pub = rospy.Publisher('', Float64, queue_size=3)
-            self.speed_pub = rospy.Publisher('', Float64, queue_size=3)
+            self.steer_pub = rospy.Publisher('/commands/servo/position', Float64, queue_size=3)
+            self.speed_pub = rospy.Publisher('/commands/motor/current', Float64, queue_size=3)
             self.speed_K = 1.0
 
         self.max_steer = 1.0

@@ -1,10 +1,17 @@
 <launch>
 
+   <group ns="/racecar/out">
     <include file="$(find astra_launch)/launch/astra.launch">
-        <arg name="depth" value="mydepth"/>
+	<arg name="camera" value="stereo_camera" />
+        <arg name="depth" value="depth"/>
+	
         <remap from="/camera/depth/image" to="/racecar/out/stereo_camera/depth_image"/>
-        <remap from="/camera/depth_registered/points" to="/racecar/out/stereo_camera/depth_cloud"/>
+	<remap from="/camera/mydepth/image" to="/racecar/out/stereo_camera/depth_image"/>
+        
+	<remap from="/camera/depth_registered/points" to="/racecar/out/stereo_camera/depth_cloud"/>
+	<remap from="/camera/mydepth/points" to="/racecar/out/stereo_camera/depth_cloud"/>
     </include>
+</group>
 
     <node name="rgb_cam" pkg="libuvc_camera" type="camera_node">
         <remap from="/image_raw" to="/racecar/out/stereo_camera/rgb/image"/>
