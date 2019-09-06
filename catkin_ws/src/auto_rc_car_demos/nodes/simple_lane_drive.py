@@ -160,6 +160,7 @@ if __name__ == "__main__":
 
         c, c_mag = detect_sign(img)
 
+        c = 'x'
         if c == 'r':
             light_speed_scale = 0.0
         else:
