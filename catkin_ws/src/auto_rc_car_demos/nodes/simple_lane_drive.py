@@ -217,7 +217,8 @@ if __name__ == "__main__":
         lidar_speed_scale = lidar_front_speed_scale * lidar_left_speed_scale * lidar_right_speed_scale
         
 
-        control = -1.5*(centroid_x - (cols/2.0))/cols
+        centroid_percentage = (centroid_x - (cols/2.0))/cols
+        control = centroid_percentage
         steer_speed_scale = 1.0 / (20.0 * control*control + 1.0)
         speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
 
@@ -225,6 +226,7 @@ if __name__ == "__main__":
         print("dt=%f" % dt)
         print("speed=%f" % speed)
         print("steer=%f" % control)
+        print("black centroid=%f", centroid_percentage)
         print("c=%s" % c)
         print("c_mag=%f" % c_mag)
         print("dist_front_left=%f" % dist_front_left)
