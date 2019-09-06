@@ -96,7 +96,7 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         else:
             self.steer_pub = rospy.Publisher('/commands/servo/position', Float64, queue_size=3)
             self.speed_pub = rospy.Publisher('/commands/motor/current', Float64, queue_size=3)
-            self.speed_K = 1.0
+            self.speed_K = 0# -10.0
 
         self.max_steer = 1.0
         self.max_current = 7.0
@@ -107,8 +107,8 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         msg.speed = speed
         msg.steer = steer
         self.control_pub.publish(msg)
-        self.steer_pub.publish(Float64(steer))
-        self.speed_pub.publish(Float64(speed))
+        self.steer_pub.publish(Float64(self.steer_to_servo_position(steer)))
+        self.speed_pub.publish(Float64(self.speed_to_current(speed)))
 
     def steer_to_servo_position(self, steer):
         # Angle in should be -th to th max for steering
@@ -123,7 +123,7 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
 
     def speed_to_current(self, speed):
         current = speed * self.speed_K
-        return 
+        return current 
 
 def CreateRCCar():
     client_type = rospy.get_param('/client_comm_type', 'remote')
