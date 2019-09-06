@@ -114,7 +114,7 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         # Angle in should be -th to th max for steering
         if steer < -self.max_steer:
             steer = -self.max_steer
-        if steer > self.max_steer
+        if steer > self.max_steer:
             steer = self.max_steer
 
         # Transform to 0-1
