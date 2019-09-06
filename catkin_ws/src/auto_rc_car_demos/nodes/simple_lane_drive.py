@@ -130,8 +130,9 @@ def lidar_gen_distance_in_range(scan, th1, th2):
     if len(meas) == 0:
         return -1
 
-    return 0.5 * (min(meas) + np.mean(meas)) - np.std(meas)
+    calc = 0.5 * (min(meas) + np.mean(meas)) - np.std(meas)
 
+    return max(0.05, calc)
 
 
 if __name__ == "__main__":
@@ -203,7 +204,7 @@ if __name__ == "__main__":
             if dist_too_close(dist_front_left, 0.5) or dist_too_close(dist_front_right, 0.5):
                 lidar_front_speed_scale = 0.0
             
-            dist_left = lidar_gen_distance_in_range(lidar, -0.6, -3)
+            dist_left = lidar_gen_distance_in_range(lidar, -3, -0.6)
             if dist_too_close(dist_left, 0.25):
                 lidar_left_speed_scale = 0.5
 
