@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import rospy
 import numpy as np
+import math
 
 from sensor_msgs.msg import LaserScan, Image, PointCloud2
 from std_msgs.msg import Float64
@@ -93,10 +94,15 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
             self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
             self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
             self.speed_K = 1.0
+            self.anti_deadband = 0
+            self.max_speed = 99
+            self.brake_pub = None
         else:
             self.steer_pub = rospy.Publisher('/commands/servo/position', Float64, queue_size=3)
             self.speed_pub = rospy.Publisher('/commands/motor/current', Float64, queue_size=3)
-            self.speed_K = 0# -10.0
+            self.brake_pub = rospy.Publisher('commands/motor/brake', Float64, queue_size=1)
+            self.speed_K = -0.5
+            self.anti_deadband = 1
 
         self.max_steer = 1.0
         self.max_current = 7.0
@@ -109,6 +115,11 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         self.control_pub.publish(msg)
         self.steer_pub.publish(Float64(self.steer_to_servo_position(steer)))
         self.speed_pub.publish(Float64(self.speed_to_current(speed)))
+
+    def brake(self):
+        self.send_control(0, 0)
+        if self.brake_pub is not None:
+            self.brake_pub.publish(1)
 
     def steer_to_servo_position(self, steer):
         # Angle in should be -th to th max for steering
@@ -129,6 +140,16 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
 
     def speed_to_current(self, speed):
         current = speed * self.speed_K
+        if current > 0.1 and current < self.anti_deadband:
+            current = current + self.anti_deadband
+        if current < -0.1 and current > -self.anti_deadband:
+            current = current - self.anti_deadband
+        
+        if current < -self.max_current:
+            current = -self.max_current
+        if current > self.max_current:
+            current = self.max_current
+        
         return current 
 
 def CreateRCCar():

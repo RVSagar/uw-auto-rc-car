@@ -116,27 +116,33 @@ def detect_sign(img):
 
 
 
-def lidar_gen_distance_in_range(scan, th1, th2):
+def lidar_data_too_close(scan, th1, th2, min_dist):
     if th2 < th1:
         temp = th1
         th1 = th2
-        th2 = th1
+        th2 = temp
     
     th1 = max(th1, scan.angle_min)
     th2 = min(th2, scan.angle_max)
+
 
     ind_start = int((th1 - scan.angle_min) / scan.angle_increment)
     ind_end = int((th2 - scan.angle_min) / scan.angle_increment)
 
     meas = scan.ranges[ind_start:ind_end]
+    total = len(meas)
     meas = [m for m in meas if np.isfinite(m)]
 
     if len(meas) == 0:
-        return -1
+        return 0
 
-    calc = 0.5 * (min(meas) + np.mean(meas)) - np.std(meas)
+    num_too_close = 0.0
+    for m in meas:
+        if m < min_dist:
+            num_too_close = num_too_close + 1
 
-    return max(0.05, calc)
+    return float(num_too_close) / total
+
 
 
 if __name__ == "__main__":
@@ -146,10 +152,16 @@ if __name__ == "__main__":
     dist = 0
 
     threshold = 15
-    base_speed = 10.0
+    base_speed = 8.0
+
+    t_start = rospy.Time.now()
 
     while not rospy.is_shutdown():
         
+        if (rospy.Time.now() - t_start).to_sec() > 20:
+            car.send_control(0,0)
+            break
+
         img, dt = car.get_latest_camera_rgb()
         img = car.camera_to_cv_image(img)
         lidar, dt2 = car.get_latest_lidar()
@@ -163,13 +175,13 @@ if __name__ == "__main__":
         rows, cols, _ = img.shape    
 
 	#print("Getting centroid for steering...")
-	#img_size = img.shape
-	print(img_size)
-	img_scale = 0.5
+	img_size = img.shape
+	#print(img_size)
+	img_scale = 0.25
 	newX = int(img_size[1]*img_scale)
 	newY = int(img_size[0]*img_scale)
 	img_red = cv2.resize(img, (newX, newY))
-        centroid_x = get_black_centroid(img_red, scaled_by=0.5)
+        centroid_x = get_black_centroid(img_red, scaled_by=img_scale)
 	#print("  done")
 
         c, c_mag = detect_sign(img_red)
@@ -197,23 +209,24 @@ if __name__ == "__main__":
         dist_right = -2
         try:
             sweep = 0.5
-            dist_front_left = lidar_gen_distance_in_range(lidar, -3.12, -3.12+sweep)
-            dist_front_right = lidar_gen_distance_in_range(lidar, 3.14, 3.14-sweep)
+            front_limit = 1.5
+            dist_front_left = lidar_data_too_close(lidar, -3.12, -3.12+sweep, front_limit)
+            dist_front_right = lidar_data_too_close(lidar, 3.14-sweep, 3.14, front_limit)
 
             def dist_too_close(dist, close_limit):
                 if dist > 0 and dist < close_limit:
                     return True
                 return False
 
-            if dist_too_close(dist_front_left, 0.5) or dist_too_close(dist_front_right, 0.5):
+            if dist_front_left > 0.05 or dist_front_right > 0.05:
                 lidar_front_speed_scale = 0.0
             
-            dist_left = lidar_gen_distance_in_range(lidar, -3, -0.6)
-            if dist_too_close(dist_left, 0.25):
+            dist_left = lidar_data_too_close(lidar, -3, -0.6, 0.25)
+            if dist_left > 0.1:
                 lidar_left_speed_scale = 0.5
 
-            dist_right = lidar_gen_distance_in_range(lidar, 0.6, 3)
-            if dist_too_close(dist_right, 0.25):
+            dist_right = lidar_data_too_close(lidar, 0.6, 3, 0.25)
+            if dist_right > 0.1:
                 lidar_right_speed_scale = 0.5
 
         except ZeroDivisionError as e:
@@ -241,8 +254,10 @@ if __name__ == "__main__":
         print("dist_left=%f" % dist_left)
         print("dist_right=%f" % dist_right)
         
-
-        car.send_control(speed, control_ang)
+        if abs(speed) < 0.1:
+            car.brake()
+        else:
+            car.send_control(speed, control_ang)
 
         
         #cv2.line(img, (centroid_x, 0), (centroid_x, rows), (0, 0, 255), 2)
