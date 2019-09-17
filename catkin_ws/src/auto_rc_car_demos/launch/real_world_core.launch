@@ -4,8 +4,9 @@
 
     <param name="car_context" value="real"/>
 
+    <!-->
     <include file="$(find auto_rc_car_description)/launch/viz_car_$(arg viz_type).launch"/>
-
+    -->
 	
     <include file="$(find sensor_wrappers)/launch/astra.launch">
     </include>
