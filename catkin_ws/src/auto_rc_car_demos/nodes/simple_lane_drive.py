@@ -162,15 +162,15 @@ if __name__ == "__main__":
             continue    
         rows, cols, _ = img.shape    
 
-	print("Getting centroid for steering...")
-	img_size = img.shape
+	#print("Getting centroid for steering...")
+	#img_size = img.shape
 	print(img_size)
 	img_scale = 0.5
 	newX = int(img_size[1]*img_scale)
 	newY = int(img_size[0]*img_scale)
 	img_red = cv2.resize(img, (newX, newY))
         centroid_x = get_black_centroid(img_red, scaled_by=0.5)
-	print("  done")
+	#print("  done")
 
         c, c_mag = detect_sign(img_red)
 	#c = 'g'
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         steer_speed_scale = 1.0 / (20.0 * control_ang*control_ang + 1.0)
         speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
 
- 
+        print("")
         print("dt=%f" % dt)
         print("speed=%f" % speed)
         print("steer_ang=%f" % control_ang)
@@ -240,7 +240,7 @@ if __name__ == "__main__":
         print("dist_front_right=%f" % dist_front_right)
         print("dist_left=%f" % dist_left)
         print("dist_right=%f" % dist_right)
-        print("")
+        
 
         car.send_control(speed, control_ang)
 
