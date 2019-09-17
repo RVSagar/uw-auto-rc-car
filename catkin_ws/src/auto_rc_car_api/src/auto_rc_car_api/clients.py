@@ -136,6 +136,9 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
 
         # Transform to 0-1
         steer = steer/2.0 + 0.5
+        
+        # Correct bias
+        steer = steer - 0.055
         return steer
 
     def speed_to_current(self, speed):
