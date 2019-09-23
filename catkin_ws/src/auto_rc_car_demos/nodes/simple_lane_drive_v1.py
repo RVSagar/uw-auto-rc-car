@@ -1,23 +1,31 @@
 #!/usr/bin/env python2
+
+import logging
+
 import rospy
 import numpy as np
 import cv2
 import math
-import logging
+
 import datetime
 import sys
 
 from auto_rc_car_api.clients import CreateRCCar
 
-_SHOW_IMAGE = True
+
+
+_SHOW_IMAGE = False
 BLACK_MIN = np.array([0, 0, 0],np.uint8)
-BLACK_MAX = np.array([180, 255, 57],np.uint8)
-SPEED = 1.5
+BLACK_MAX = np.array([180, 255, 90],np.uint8)
+BASE_SPEED = 5
 STEERING_OFFSET = 0
-TIMEOUT = 200.0
+TIMEOUT = 15
 MAX_ANGLE_DEV_1_LINE = 1
-MAX_ANGLE_DEV_2_LINES = 20
-IMG_SCALE = 0.5
+MAX_ANGLE_DEV_2_LINES = 6 
+IMG_SCALE = 0.25
+ROI = 0.5
+K_DT = 2
+STEER_SCALE = 26
 
 class HandCodedLaneFollower():
 
@@ -28,7 +36,7 @@ class HandCodedLaneFollower():
 
     def follow_lane(self, frame):
         # Main entry point of the lane follower
-        show_image("orig", frame)
+        #show_image("orig", frame)
 
         lane_lines, frame = detect_lane(frame)
         final_frame, final_steering_angle = self.steer(frame, lane_lines)
@@ -44,7 +52,7 @@ class HandCodedLaneFollower():
         if len(lane_lines) == 0:
             logging.error('No lane lines detected, nothing to do.')
 	    print("No lane lines detected, nothing to do.")
-            return frame, self.curr_steering_angle
+            return frame, self.convert_to_VESC_steer(self.curr_steering_angle)
 
         new_steering_angle = compute_steering_angle(frame, lane_lines)
         self.curr_steering_angle = stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
@@ -66,18 +74,18 @@ def detect_lane(frame):
     logging.debug('detecting lane lines...')
 
     edges = detect_edges(frame)
-    show_image('edges', edges)
+    #show_image('edges', edges)
 
     cropped_edges = region_of_interest(edges)
-    show_image('edges cropped', cropped_edges)
+    #show_image('edges cropped', cropped_edges)
 
     line_segments = detect_line_segments(cropped_edges)
     line_segment_image = display_lines(frame, line_segments)
-    show_image("line segments", line_segment_image)
+    #show_image("line segments", line_segment_image)
 
     lane_lines = average_slope_intercept(frame, line_segments)
     lane_lines_image = display_lines(frame, lane_lines)
-    show_image("lane lines", lane_lines_image)
+    #show_image("lane lines", lane_lines_image)
 
     return lane_lines, lane_lines_image
 
@@ -85,9 +93,9 @@ def detect_lane(frame):
 def detect_edges(frame):
     # filter for black lane lines
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    show_image("hsv", hsv)
+    #show_image("hsv", hsv)
     mask = cv2.inRange(hsv, BLACK_MIN, BLACK_MAX)
-    show_image("black mask", mask)
+    #show_image("black mask", mask)
 
     # detect edges
     edges = cv2.Canny(mask, 200, 400)
@@ -99,17 +107,17 @@ def region_of_interest(canny):
     height, width = canny.shape
     mask = np.zeros_like(canny)
 
-    # only focus bottom half of the screen
+    # only focus bottom ROI of the screen
 
     polygon = np.array([[
-        (0, height * 1 / 2),
-        (width, height * 1 / 2),
+        (0, height * ROI),
+        (width, height * ROI),
         (width, height),
         (0, height),
     ]], np.int32)
 
     cv2.fillPoly(mask, polygon, 255)
-    show_image("mask", mask)
+    #show_image("mask", mask)
     masked_image = cv2.bitwise_and(canny, mask)
     return masked_image
     
@@ -172,7 +180,7 @@ def average_slope_intercept(frame, line_segments):
         lane_lines.append(make_points(frame, right_fit_average))
 
     logging.debug('lane lines: %s' % lane_lines)  # [[[316, 720, 484, 432]], [[1009, 720, 718, 432]]]
-
+    #print('lane lines: %s' % lane_lines)
     return lane_lines
     
 def compute_steering_angle(frame, lane_lines):
@@ -181,7 +189,7 @@ def compute_steering_angle(frame, lane_lines):
     """
     if len(lane_lines) == 0:
         logging.info('No lane lines detected, do nothing')
-        return -90
+        return -90.0
 
     height, width, _ = frame.shape
     if len(lane_lines) == 1:
@@ -189,16 +197,17 @@ def compute_steering_angle(frame, lane_lines):
         x1, _, x2, _ = lane_lines[0][0]
         x_offset = x2 - x1
     else:
-        _, _, left_x2, _ = lane_lines[0][0]
-        _, _, right_x2, _ = lane_lines[1][0]
-        camera_mid_offset_percent = 0.02 # 0.0 means car pointing to center, -0.03: car is centered to left, +0.03 means car pointing to right
+        _, _, left_x2, _ = lane_lines[1][0]
+        _, _, right_x2, _ = lane_lines[0][0]
+        camera_mid_offset_percent = 0.0 # 0.0 means car pointing to center, -0.03: car is centered to left, +0.03 means car pointing to right
+	#print(lane_lines[0][0])
         mid = int(width / 2 * (1 + camera_mid_offset_percent))
         x_offset = (left_x2 + right_x2) / 2 - mid
 
     # find the steering angle, which is angle between navigation direction to end of center line
     y_offset = int(height / 2)
 
-    angle_to_mid_radian = math.atan(x_offset / y_offset)  # angle (in radian) to center vertical line
+    angle_to_mid_radian = math.atan(float(x_offset) / float(y_offset))  # angle (in radian) to center vertical line
     angle_to_mid_deg = int(angle_to_mid_radian * 180.0 / math.pi)  # angle (in degrees) to center vertical line
     steering_angle = angle_to_mid_deg + 90  # this is the steering angle needed by picar front wheel
 
@@ -279,7 +288,7 @@ def make_points(frame, line):
     height, width, _ = frame.shape
     slope, intercept = line
     y1 = height  # bottom of the frame
-    y2 = int(y1 * 1 / 2)  # make points from middle of the frame down
+    y2 = int(y1*ROI)  # make points from middle of the frame down
 
     # bound the coordinates within the frame
     x1 = max(-width, min(2 * width, int((y1 - intercept) / slope)))
@@ -345,31 +354,6 @@ def make_points(frame, line):
     x2 = max(-width, min(2 * width, int((y2 - intercept) / slope)))
     return [[x1, y1, x2, y2]]
 
-def get_black_centroid(img, scaled_by):
-    rows, cols, _ = img.shape
-    count = 0
-    totX = 0
-    
-    threshold = 20
-    num_thresh = 30 
-    drop_bottom_rows = 20
-
-    for y in range(int(rows/2.5), rows-drop_bottom_rows):
-        for x in range(0, cols):
-            b,g,r = img[y, x]
-            
-            if b < threshold and g < threshold and r < threshold:
-                count += 1
-                totX += x
-
-    if totX < num_thresh:
-        centroid_x = int(cols / 2)
-    else:
-        centroid_x = int(totX / (count + 1))
-    
-    cv2.line(img, (centroid_x, 0), (centroid_x, rows), (0, 0, 255), 2)
-    return int(centroid_x / scaled_by)
-
 def stabilize_steering_angle(curr_steering_angle, new_steering_angle, num_of_lane_lines, max_angle_deviation_two_lines=5, max_angle_deviation_one_lane=1):
     """
     Using last steering angle to stabilize the steering angle
@@ -420,25 +404,98 @@ def lidar_data_too_close(scan, th1, th2, min_dist):
 
     return float(num_too_close) / total
 
-############################
-# Test Functions
-############################
-def test_photo(img):
-    land_follower = HandCodedLaneFollower()
-    combo_image = land_follower.follow_lane(img)
-    show_image('final', combo_image, True)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+def detect_sign(img):
+    rows, cols, _ = img.shape
+    print("rows=%d"%rows)
+    print("cols=%d"%cols)
+    midr = rows/2
+    midc = cols/2
 
+    grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    grey = grey[0:midr, midc:]
+
+    circles = cv2.HoughCircles(grey, cv2.HOUGH_GRADIENT, 1, 25, param1=30, param2=18)
+    #print(circles)
+
+    #cv2.imshow("Car Camera", grey)
+    #cv2.waitKey(25)
+
+    if circles is None:
+        return 'n', 0
+
+    circles = np.round(circles[0, :]).astype("int")
+    # loop over the (x, y) coordinates and radius of the circles
+    for (x0, y0, r) in circles:
+        if r < 8:
+            print("too small")
+            continue
+        
+        # draw the circle in the output image, then draw a rectangle
+        # corresponding to the center of the circle
+        #print("midr=%d"%midr)
+        #print("midc=%d"%midc)
+
+        x = midc+x0
+        y = midr+y0
+        sr = int(1.0/math.sqrt(2.0) * r)
+
+        i_low = x - sr
+        i_high = x + sr
+        if i_low < 0 or i_high >= cols:
+            #print("i (%d, %d) out of range" % (i_low, i_high))
+            continue
+
+        j_low = y0 - sr
+        j_high = y0 + sr
+        if j_low < 0 or j_high >= rows:
+            #print("j (%d, %d) out of range" % (j_low, j_high))
+            continue
+
+        cv2.circle(img, (x , y0), r, (0, 255, 0), 4)
+        cv2.rectangle(img, (x - 5, y0 - 5), (x + 5, y0 + 5), (0, 128, 255), -1)
+
+        color_acc = [0,0,0]
+        count = 0.0
+        for i in range(i_low, i_high):
+            for j in range(j_low, j_high):
+                color = img[j, i]
+                #print(color)
+                color_acc = color_acc + color
+                count = count + 1.0
+        color_acc = color_acc / count
+        #print("avg_color: {}".format(color_acc))
+
+        b = color_acc[0]
+        g = color_acc[1]
+        r = color_acc[2]
+
+        tot = float(b + g + r)
+
+        thresh = 0.5
+        r = r / tot
+        g = g / tot
+
+        #print("r=%f"%r)
+        #print("g=%f"%g)
+
+        if r > thresh:
+            return 'r', r
+
+        if g > thresh:
+            return 'g', g
+
+    return 'n', 0
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     car = CreateRCCar()
     lane_follower = HandCodedLaneFollower()
+
     
     print("Starting")
 
     t_start = rospy.Time.now()
-
+	
     while not rospy.is_shutdown():
         
         if (rospy.Time.now() - t_start).to_sec() > TIMEOUT:
@@ -450,7 +507,7 @@ if __name__ == "__main__":
         lidar, dt2 = car.get_latest_lidar()
 	
 	
-        dt_speed_scale = 1.0 / (1 + 50* dt)
+        dt_speed_scale = 1.0 / (1 + K_DT* dt)
 
         if img is None:
             car.software_sleep(0.25)
@@ -465,8 +522,54 @@ if __name__ == "__main__":
 	newY = int(img_size[0]*img_scale)
 	img_red = cv2.resize(img, (newX, newY))
 	
+        #c, c_mag = detect_sign(img_red)
+
+        #c = 'x'
+        #if c == 'r':
+        #    light_speed_scale = 0.0
+        #else:
+        light_speed_scale = 1.0
+
+	lidar_front_speed_scale = 1.0
+        lidar_left_speed_scale = 1.0
+        lidar_right_speed_scale = 1.0
+
+        dist_front = -2
+        dist_front_left = -2
+        dist_front_right = -2
+        dist_left = -2
+        dist_right = -2
+
+        try:
+            sweep = 0.5
+            front_limit = 0.75
+            dist_front_left = lidar_data_too_close(lidar, -3.12, -3.12+sweep, front_limit)
+            dist_front_right = lidar_data_too_close(lidar, 3.14-sweep, 3.14, front_limit)
+
+            def dist_too_close(dist, close_limit):
+                if dist > 0 and dist < close_limit:
+                    return True
+                return False
+
+            if dist_front_left > 0.05 or dist_front_right > 0.05:
+                lidar_front_speed_scale = 0.0
+            
+            dist_left = lidar_data_too_close(lidar, -3, -0.6, 0.25)
+            if dist_left > 0.1:
+                lidar_left_speed_scale = 0.5
+
+            dist_right = lidar_data_too_close(lidar, 0.6, 3, 0.25)
+            if dist_right > 0.1:
+                lidar_right_speed_scale = 0.5
+
+        except ZeroDivisionError as e:
+            print(e)
+        
+        lidar_speed_scale = lidar_front_speed_scale * lidar_left_speed_scale * lidar_right_speed_scale
+	#lidar_speed_scale = 1.0
 	returned_img, control_ang = lane_follower.follow_lane(img_red)
-        speed = SPEED
+        steer_speed_scale = 1.0 / (STEER_SCALE* control_ang*control_ang + 1.0)
+        speed = BASE_SPEED * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
 
         if abs(speed) < 0.1:
             car.brake()
@@ -474,6 +577,10 @@ if __name__ == "__main__":
             car.send_control(speed, control_ang)
 	
 	print("Steering Angle: ", control_ang)
+	print("Speed: ", speed)
+	#print("dt: ", dt)
+	#print("lidar_speed_scale: ", lidar_speed_scale)
+	print("========================")
         if _SHOW_IMAGE:
 	    cv2.waitKey(25)
 	

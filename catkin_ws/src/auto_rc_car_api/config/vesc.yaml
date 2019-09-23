@@ -35,5 +35,5 @@ vesc_driver:
   speed_max: 3250
   position_min: 0.0
   position_max: 0.0
-  servo_min: 0.15
-  servo_max: 0.85
+  servo_min: 0.05
+  servo_max: 0.95
