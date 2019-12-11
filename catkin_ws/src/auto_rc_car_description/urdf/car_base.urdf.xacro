@@ -230,7 +230,7 @@ mit-racecar/racecar_gazebo
 
 
 <joint name="hoyuko_fixed_joint" type="fixed">
-    <origin xyz="0 0 0.15" rpy="0 0 3.1415"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
     <parent link="chassis_link"/>
     <child link="hoyuko_laser_link"/>
     <axis xyz="0 0 1" />
@@ -267,20 +267,20 @@ mit-racecar/racecar_gazebo
       <ray>
         <scan>
           <horizontal>
-            <samples>1081</samples>
+            <samples>720</samples>
             <resolution>1</resolution>
-            <min_angle>-2.3561944902</min_angle>
-            <max_angle>2.3561944902</max_angle>
+            <min_angle>-1.57079632679</min_angle>
+            <max_angle>1.57079632679</max_angle>
           </horizontal>
         </scan>
         <range>
           <min>0.1</min>
-          <max>10.0</max>
+          <max>12.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>
           <mean>0.0</mean>
-          <stddev>0.01</stddev>
+          <stddev>0.0</stddev>
         </noise>
       </ray>
       <plugin name="gazebo_ros_hokuyo_controller" filename="libgazebo_ros_laser.so">
