@@ -269,8 +269,8 @@ mit-racecar/racecar_gazebo
           <horizontal>
             <samples>720</samples>
             <resolution>1</resolution>
-            <min_angle>-1.57079632679</min_angle>
-            <max_angle>1.57079632679</max_angle>
+            <min_angle>-1.570796327</min_angle>
+            <max_angle>1.570796327</max_angle>
           </horizontal>
         </scan>
         <range>
