@@ -76,6 +76,9 @@ class AutoRCCarClientRemote(AutoRCCarClientBase):
         self.controls.send_control(msg)
         #self.control_pub.publish(msg)
 
+    def brake(self):
+        self.controls.brake()
+
 
 
 
@@ -102,3 +105,6 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         msg.steer = steer
 
         self.controls.send_control(msg)
+
+    def brake(self):
+        self.controls.brake()

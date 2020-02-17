@@ -1,8 +1,0 @@
-<launch>
-  <include file="$(find auto_rc_car_worlds)/launch/empty_world.launch"/>
-  <include file="$(find auto_rc_car_description)/launch/spawn_car.launch"/>
-  <include file="$(find auto_rc_car_control)/launch/start_car_controls.launch"/>
-
-  <!--rosrun teleop_twist_keyboard teleop_twist_keyboard.py-->
-
-</launch>

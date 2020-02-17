@@ -30,7 +30,10 @@ class BaseControlModule:
 
 
     def brake(self):
-        self.send_control(0, 0)
+        msg = carSteering()
+        msg.speed = 0
+        msg.steer = 0
+        self.send_control(msg)
         if self.brake_pub is not None:
             self.brake_pub.publish(1)
 

@@ -10,5 +10,5 @@
   </include>
 
   <param name="track_description" command="cat '$(find auto_rc_car_worlds)/urdf/circle_track.urdf'" />
-  <node name="spawn_track_urdf" pkg="gazebo_ros" type="spawn_model" args="-param track_description -x 0.0 -y 7.0 -z 0.00 -urdf -model circle_track --verbose" respawn="false" output="screen"/>
+  <node name="spawn_track_urdf" pkg="gazebo_ros" type="spawn_model" args="-param track_description -x 0.0 -y 7.0 -z 0.00 -urdf -model circle_track" respawn="false" output="screen"/>
 </launch>
