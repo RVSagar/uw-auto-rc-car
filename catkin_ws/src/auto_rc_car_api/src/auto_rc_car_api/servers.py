@@ -62,27 +62,7 @@ class AutoRCCarRemoteCore:
                                       '/racecar/api_internal/control', carSteering,
                                       'racecar_api/last_control', carControls, carControlsResponse)
 
-        self.control_sub = rospy.Subscriber('/racecar/api_internal/control', carSteering, self.control_cb)
-        self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
-        self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
-
-
-    def control_cb(self, msg):
-        speed = Float64()
-        speed.data = msg.speed
-
-        steer = Float64()
-        steer.data = msg.steer
-
-        self.steer_pub.publish(steer)
-        self.speed_pub.publish(speed)
-
 
     def run(self):
         while not rospy.is_shutdown():
             rospy.sleep(1)
-
-
-if __name__ == "__main__":
-    car = AutoRCCarRemoteCore()
-    car.run()

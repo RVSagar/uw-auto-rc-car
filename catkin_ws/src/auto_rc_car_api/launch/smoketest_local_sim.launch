@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find auto_rc_car_worlds)/launch/empty_world.launch"/>
+    <include file="$(find auto_rc_car_description)/launch/spawn_car.launch"/>
+    <include file="$(find auto_rc_car_control)/launch/start_car_controls.launch"/>
+    
+    <node name="client" pkg="auto_rc_car_api" type="smoketest_local_sim_client.py" output="screen" required="true"/>
+</launch>
