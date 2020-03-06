@@ -15,7 +15,7 @@
   <group ns="sign0">
     <param name="robot_description" command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/stoplight.xacro.urdf" />
 
-    <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -x 5.0 -y -2.0 -z 0.00 -Y 3.1415 -urdf -model stoplight0 --verbose" respawn="false" output="screen"/>
+    <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -x 5.0 -y -2.0 -z 0.00 -Y 3.1415 -urdf -model stoplight0" respawn="false" output="screen"/>
     <rosparam  command="load" file="$(find auto_rc_car_worlds)/config/stoplight_controller.yaml"/>
     <node name="world_controller_spawner"
       pkg="controller_manager"

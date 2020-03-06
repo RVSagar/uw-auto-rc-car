@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import math
 
-from auto_rc_car_api.clients import CreateRCCar
+from auto_rc_car_api.client_factory import ClientGenerator
 
 
 def get_black_centroid(img, scaled_by):
@@ -146,7 +146,8 @@ def lidar_data_too_close(scan, th1, th2, min_dist):
 
 
 if __name__ == "__main__":
-    car = CreateRCCar()
+    car = ClientGenerator.CreateRCCarClient(rospy.get_param("client_context_type"),
+                                            rospy.get_param("client_comm_type"))
     
     print("Starting")
     dist = 0
@@ -155,10 +156,11 @@ if __name__ == "__main__":
     base_speed = 8.0
 
     t_start = rospy.Time.now()
+    timeout = rospy.get_param("timeout", -1)
 
     while not rospy.is_shutdown():
         
-        if (rospy.Time.now() - t_start).to_sec() > 20:
+        if timeout > 0 and (rospy.Time.now() - t_start).to_sec() > timeout:
             car.send_control(0,0)
             break
 
@@ -174,19 +176,19 @@ if __name__ == "__main__":
             continue    
         rows, cols, _ = img.shape    
 
-	#print("Getting centroid for steering...")
-	img_size = img.shape
-	#print(img_size)
-	img_scale = 0.25
-	newX = int(img_size[1]*img_scale)
-	newY = int(img_size[0]*img_scale)
-	img_red = cv2.resize(img, (newX, newY))
+        #print("Getting centroid for steering...")
+        img_size = img.shape
+        #print(img_size)
+        img_scale = 0.25
+        newX = int(img_size[1]*img_scale)
+        newY = int(img_size[0]*img_scale)
+        img_red = cv2.resize(img, (newX, newY))
         centroid_x = get_black_centroid(img_red, scaled_by=img_scale)
-	#print("  done")
+        #print("  done")
 
         c, c_mag = detect_sign(img_red)
-	#c = 'g'
-	#c_mag = -1
+        #c = 'g'
+        #c_mag = -1
 
         c = 'x'
         if c == 'r':
@@ -218,15 +220,15 @@ if __name__ == "__main__":
                     return True
                 return False
 
-            if dist_front_left > 0.05 or dist_front_right > 0.05:
+            if dist_too_close(dist_front_left, 0.15) or dist_too_close(dist_front_right, 0.15):
                 lidar_front_speed_scale = 0.0
             
             dist_left = lidar_data_too_close(lidar, -3, -0.6, 0.25)
-            if dist_left > 0.1:
+            if dist_too_close(dist_left, 0.5):
                 lidar_left_speed_scale = 0.5
 
             dist_right = lidar_data_too_close(lidar, 0.6, 3, 0.25)
-            if dist_right > 0.1:
+            if dist_too_close(dist_right, 0.5):
                 lidar_right_speed_scale = 0.5
 
         except ZeroDivisionError as e:
@@ -237,7 +239,7 @@ if __name__ == "__main__":
         centroid_percentage = (centroid_x / float(cols) - 0.25)*2.0 
         centroid_percentage = (centroid_x / float(cols) - 0.5) * 2.0
         #centroid_percentage = (centroid_x - (cols/2.0))/cols
-        control_ang = -centroid_percentage * 1.0
+        control_ang = -centroid_percentage * 0.25
         steer_speed_scale = 1.0 / (20.0 * control_ang*control_ang + 1.0)
         speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
 

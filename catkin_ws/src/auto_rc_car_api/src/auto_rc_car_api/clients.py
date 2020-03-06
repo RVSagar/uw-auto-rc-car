@@ -7,6 +7,7 @@ from sensor_msgs.msg import LaserScan, Image, PointCloud2
 from std_msgs.msg import Float64
 
 from data_modules import RemoteDataModule, LocalDataModule, BaseDataModule
+
 from auto_rc_car_api.msg import carSteering
 from auto_rc_car_api.srv import carLidar, carCamera, carControls
 from cv_bridge import CvBridge, CvBridgeError
@@ -52,7 +53,7 @@ class AutoRCCarClientBase:
 
 class AutoRCCarClientRemote(AutoRCCarClientBase):
 
-    def __init__(self):
+    def __init__(self, controls):
         rospy.init_node('rc_car_client')
         print("Starting Client")
 
@@ -60,9 +61,10 @@ class AutoRCCarClientRemote(AutoRCCarClientBase):
         self.camera_rgb = RemoteDataModule(rospy, '/racecar_api/camera/rgb', carCamera, lambda msg: msg.camera)
         self.camera_depth = RemoteDataModule(rospy, '/racecar_api/camera/depth', carCamera, lambda msg: msg.camera)
         self.camera_cloud = RemoteDataModule(rospy, '/racecar_api/camera/cloud', carCamera, lambda msg: msg.cloud)
-        self.controls = RemoteDataModule(rospy, '/racecar_api/last_control', carControls, lambda msg: msg.controls)
-
-        self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
+        
+        self.controls = controls
+        #self.controls = RemoteDataModule(rospy, '/racecar_api/last_control', carControls, lambda msg: msg.controls)
+        #self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
 
         print("Client Initialized")
 
@@ -71,14 +73,18 @@ class AutoRCCarClientRemote(AutoRCCarClientBase):
         msg = carSteering()
         msg.speed = speed
         msg.steer = steer
-        self.control_pub.publish(msg)
+        self.controls.send_control(msg)
+        #self.control_pub.publish(msg)
+
+    def brake(self):
+        self.controls.brake()
 
 
 
 
 class AutoRCCarClientLocal(AutoRCCarClientBase):
 
-    def __init__(self, context):
+    def __init__(self, controls):
         rospy.init_node('rc_car_client')
         print("Starting Client")
 
@@ -86,82 +92,19 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         self.camera_rgb = LocalDataModule(rospy, '/racecar/out/stereo_camera/rgb/image', Image)
         self.camera_depth = LocalDataModule(rospy, '/racecar/out/stereo_camera/depth/image', Image)
         self.camera_cloud = LocalDataModule(rospy, '/racecar/out/stereo_camera/depth_cloud/points', PointCloud2)
-        self.controls = LocalDataModule(rospy, '/racecar/api_internal/control', carSteering)
+        
+        self.controls = controls
+        #self.controls = LocalDataModule(rospy, '/racecar/api_internal/control', carSteering)
+        #self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
 
-        self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
-
-        if context == 'sim':
-            self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
-            self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
-            self.speed_K = 1.0
-            self.anti_deadband = 0
-            self.max_speed = 99
-            self.brake_pub = None
-        else:
-            self.steer_pub = rospy.Publisher('/commands/servo/position', Float64, queue_size=3)
-            self.speed_pub = rospy.Publisher('/commands/motor/current', Float64, queue_size=3)
-            self.brake_pub = rospy.Publisher('commands/motor/brake', Float64, queue_size=1)
-            self.speed_K = -0.5
-            self.anti_deadband = 1
-
-        self.max_steer = 1.0
-        self.max_current = 7.0
         print("Client Initialized")
 
     def send_control(self, speed, steer):
         msg = carSteering()
         msg.speed = speed
         msg.steer = steer
-        self.control_pub.publish(msg)
-        self.steer_pub.publish(Float64(self.steer_to_servo_position(steer)))
-        self.speed_pub.publish(Float64(self.speed_to_current(speed)))
+
+        self.controls.send_control(msg)
 
     def brake(self):
-        self.send_control(0, 0)
-        if self.brake_pub is not None:
-            self.brake_pub.publish(1)
-
-    def steer_to_servo_position(self, steer):
-        # Angle in should be -th to th max for steering
-        if steer < -self.max_steer:
-            steer = -self.max_steer
-        if steer > self.max_steer:
-            steer = self.max_steer
-        
-        # Correct direction
-        steer = -steer
-        
-        # Transform to -1 to 1
-        steer = steer / self.max_steer
-
-        # Transform to 0-1
-        steer = steer/2.0 + 0.5
-        
-        # Correct bias
-        steer = steer - 0.055
-        return steer
-
-    def speed_to_current(self, speed):
-        current = speed * self.speed_K
-        if current > 0.1 and current < self.anti_deadband:
-            current = current + self.anti_deadband
-        if current < -0.1 and current > -self.anti_deadband:
-            current = current - self.anti_deadband
-        
-        if current < -self.max_current:
-            current = -self.max_current
-        if current > self.max_current:
-            current = self.max_current
-        
-        return current 
-
-def CreateRCCar():
-    client_type = rospy.get_param('/client_comm_type', 'remote')
-    context = rospy.get_param('/car_context', 'sim')
-
-    if client_type == 'remote':
-        return AutoRCCarClientRemote()
-    if client_type == 'local':
-        return AutoRCCarClientLocal(context)
-    
-    raise Exception("Client comm type not found, or does not match available types")
+        self.controls.brake()
