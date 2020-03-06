@@ -100,8 +100,8 @@ void EncoderInit()
 
 void encoder_count()
 {
-  int Lstate = digitalRead(encoder0pinA);
-  if((encoder0PinALast == LOW) && Lstate==HIGH)
+  int curr_state = digitalRead(encoder0pinA);
+  if((encoder0PinALast == LOW) && curr_state==HIGH)
   {
     int val = digitalRead(encoder0pinB);
     if(val == LOW && Direction)
@@ -113,7 +113,7 @@ void encoder_count()
       Direction = true;  //Forward
     }
   }
-  encoder0PinALast = Lstate;
+  encoder0PinALast = curr_state;
  
   if(!Direction)  pulse_count++;
   else  pulse_count--;
