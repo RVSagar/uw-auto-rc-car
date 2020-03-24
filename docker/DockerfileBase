@@ -35,6 +35,8 @@ RUN apt-get update && \
       ros-kinetic-effort-controllers \
       ros-kinetic-message-to-tf \
       ros-kinetic-rplidar-ros \
+      ros-kinetic-serial \ 
+      ros-kinetic-ackermann-msgs \
       ros-kinetic-rviz && \
     rm -rf /var/lib/apt/lists/*
 
