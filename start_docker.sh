@@ -22,8 +22,24 @@ DOCKER_GPU_ARGS="--env DISPLAY=unix${DISPLAY} --env QT_X11_NO_MITSHM=1 --volume=
 
 which nvidia-docker > /dev/null 2> /dev/null
 HAS_NVIDIA_DOCKER=$?
-if [ $HAS_NVIDIA_DOCKER -eq 0 ]; then
-  DOCKER_COMMAND=nvidia-docker
+# Docker >= 19.03 supports nvidia gpus by default, nvidia-docker is deprecated
+# Check if current docker version is >= 19.03
+DOCKER_VERSION="$(docker version --format '{{.Client.Version}}')"
+
+# Check if $1 version is less than or equal to $2
+verlte() {
+    [  "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+
+if [ $HAS_NVIDIA_DOCKER -eq 0 ] || verlte 19.03 $DOCKER_VERSION; then
+  # With new version of docker, maintain regular docker command with appended --gpus all tag
+  if verlte 19.03 $DOCKER_VERSION; then
+  	DOCKER_COMMAND=docker
+	DOCKER_GPU_ARGS="--gpus all $DOCKER_GPU_ARGS"
+  else
+	DOCKER_COMMAND=nvidia-docker
+  fi
+
   DOCKER_GPU_ARGS="$DOCKER_GPU_ARGS --env NVIDIA_VISIBLE_DEVICES=all --env NVIDIA_DRIVER_CAPABILITIES=all"
 else
   #echo "Running without nvidia-docker, if you have an NVidia card you may need it"\
