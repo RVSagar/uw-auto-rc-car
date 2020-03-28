@@ -2,7 +2,7 @@
 import rospy
 
 from auto_rc_car_api.clients import AutoRCCarClientLocal, AutoRCCarClientRemote
-from control_modules import SimulationControlModule, RealControlModule
+from control_modules import SimulationControlModule, RealControlModule, APIOnlyJoyListener, TeleopJoyListener
 
 
 class Contexts:
@@ -19,9 +19,9 @@ class ClientGenerator:
 
         controls = None
         if sim_real == Contexts.SIM:
-            controls = SimulationControlModule()
+            controls = SimulationControlModule(APIOnlyJoyListener())
         elif sim_real == Contexts.SIM:
-            context = RealControlModule()
+            context = RealControlModule(TeleopJoyListener())
         else:
             raise Exception("Please provide context 'sim' or 'real' to creation function")
 

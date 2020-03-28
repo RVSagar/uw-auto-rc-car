@@ -1,12 +1,67 @@
 
 import rospy
+import math
 
 from std_msgs.msg import Float64
+from sensor_msgs.msg import Joy
 
 from auto_rc_car_api.msg import carSteering
 
-class BaseControlModule:
+class APIOnlyJoyListener:
     def __init__(self):
+        pass
+    def api_allowed(self):
+        return True
+    def get_joy_command(self):
+        cmd = carSteering()
+        cmd.speed = 0
+        cmd.steer = 0
+        return cmd
+
+class TeleopJoyListener:
+    def __init__(self):
+        self.last_msg_time = self.now()
+
+        self.api_active = False
+        self.joy_active = False
+
+        self.msg = None
+
+        self.sub = rospy.Subscriber('/joy', Joy, self.callback)
+
+
+    def now(self):
+        return rospy.Time.now().to_sec()
+
+    def callback(self, msg):
+        self.last_msg_time = self.now()
+
+        self.joy_active = msg.buttons[4]
+        self.api_active = msg.buttons[5]
+
+        self.msg = msg
+
+    def got_command_recently(self):
+        return self.now() - self.last_msg_time < 0.25
+
+    def get_joy_command(self):
+        if self.got_command_recently() and self.joy_active:
+            cmd = carSteering()
+            cmd.speed = self.msg.axes[1]
+            cmd.steer = self.msg.axes[0]
+        else:
+            cmd = carSteering()
+            cmd.speed = 0
+            cmd.steer = 0
+        return cmd
+
+    def api_allowed(self):
+        return self.got_command_recently() and self.api_active and not self.joy_active
+
+
+
+class BaseControlModule:
+    def __init__(self, joy_module):
         self.max_steer = 1.0
         self.max_current = 7.0
 
@@ -15,11 +70,17 @@ class BaseControlModule:
         self.brake_pub = None
 
         self.last_control = None
+        
+        self.joy_module = joy_module
 
     def get(self):
         return self.last_control
 
     def send_control(self, msg):
+        if not self.joy_module.api_allowed():
+            msg = self.joy_module.get_joy_command()
+
+
         self.last_control = msg
         
         speed = self.speed_to_signal(msg.speed)
@@ -46,7 +107,7 @@ class BaseControlModule:
 
 
 class SimulationControlModule(BaseControlModule):
-    def __init__(self):
+    def __init__(self, joy_module):
         self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
         self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
         self.speed_K = 1.0
@@ -54,6 +115,7 @@ class SimulationControlModule(BaseControlModule):
         self.max_speed = 99
         self.brake_pub = None
         self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
+        self.joy_module = joy_module
 
     def speed_to_signal(self, speed):
         return speed
@@ -63,13 +125,14 @@ class SimulationControlModule(BaseControlModule):
 
 
 class RealControlModule(BaseControlModule):
-    def __init__(self):
+    def __init__(self, joy_module):
         self.steer_pub = rospy.Publisher('/commands/servo/position', Float64, queue_size=3)
         self.speed_pub = rospy.Publisher('/commands/motor/current', Float64, queue_size=3)
         self.brake_pub = rospy.Publisher('commands/motor/brake', Float64, queue_size=1)
         self.speed_K = -0.5
         self.anti_deadband = 1
         self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
+        self.joy_module = joy_module
 
     def steer_to_signal(self, steer):
         # Return servo position
