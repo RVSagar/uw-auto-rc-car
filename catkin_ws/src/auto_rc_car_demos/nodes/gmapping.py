@@ -13,22 +13,28 @@ from auto_rc_car_api.clients import CreateRCCar
 
 TIME_END = 5
 
+
+#https://gist.github.com/atotto/f2754f75bedb6ea56e3e0264ec405dcf
+#https://medium.com/@waleedmansoor/how-i-built-ros-odometry-for-differential-drive-vehicle-without-encoder-c9f73fe63d87
+
+#^Websites I referred to for the odometry implementation^
+
 class OdometryImplementation:
     def __init__(self):
         rospy.init_node('odometry_publisher', anonymous=True)
-        self.pub_odom = rospy.Publisher('odom', Odometry)
+        self.pub_odom = rospy.Publisher('odom', Odometry, queue_size = 10)
         self.odom_broadcaster = tf.TransformBroadcaster()
 
         self.angle_sub = rospy.Subscriber("/racecar/in/steering", Float64, self.steer_cb)
         self.vel_sub = rospy.Subscriber("/racecar/in/velocity", Float64, self.vel_cb)
 
     def vel_cb(self, msg):
-        self.vel_msg = msg.data    
-        #return self.vel_msg 
+        self.vel_msg = msg.data
+        return self.vel_msg 
 
-    def steer_cb(self, msg):
-        self.steering_angle = msg.data  
-        #return self.steering_angle
+    def steer_cb(self):
+        self.steering_angle = self.angle_sub
+        return self.steering_angle
     
     def angular_velocity(self):
         wheel_base = 0.13
@@ -48,8 +54,8 @@ class OdometryImplementation:
 
             dt = (current_time - last_time).to_sec()
 
-            delta_x = self.vel_sub * math.cos(yaw)
-            delta_y = self.vel_sub * math.sin(yaw)
+            delta_x = self.vel_cb(self.vel_sub) * math.cos(yaw)
+            delta_y = self.vel_cb(self.vel_sub) * math.sin(yaw)
             
             x += delta_x * dt
             y += delta_y * dt
@@ -76,7 +82,7 @@ class OdometryImplementation:
 
             #setting velocity 
             odom.child_frame_id = "base_link"
-            odom.twist.twist.linear.x = self.vel_sub
+            odom.twist.twist.linear.x = self.vel_cb(self.vel_sub)
             odom.twist.twist.linear.y = 0.0 
             odom.twist.twist.angular.z = self.angular_velocity()
 
@@ -88,14 +94,14 @@ class OdometryImplementation:
 
 
 if __name__ == "__main__":
-    car = CreateRCCar()
+    #car = CreateRCCar()
     od1 = OdometryImplementation()
     od1.main()
     time_start = rospy.Time.now()  
 
-    while(True):
-        car.send_control(10, 0.5)
+    # while(True):
+    #     car.send_control(10, 0.5)
 
-        if (rospy.Time.now() - time_start).to_sec() > TIME_END:
-            car.send_control(0,0)
-            break
+    #     if (rospy.Time.now() - time_start).to_sec() > TIME_END:
+    #         car.send_control(0,0)
+    #         break
