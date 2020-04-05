@@ -159,7 +159,7 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         
         if (rospy.Time.now() - t_start).to_sec() > 20:
-            car.send_control(0,0)
+            car.send_control(0,0) 
             break
 
         img, dt = car.get_latest_camera_rgb()
