@@ -7,4 +7,5 @@ joint_state_controller:
 stoplight_controller:
   joint: light_joint
   type: position_controllers/JointPositionController
-  pid: {p: 5.0, i: 0.0, d: 5}
+  # Will trigger an error that pid parameters are not found
+  #   this leads to the intended operation mode
