@@ -6,7 +6,7 @@ import math
 
 from auto_rc_car_api.client_factory import ClientGenerator
 
-from auto_rc_car_demos.basic_camera import BasicCameraCalc
+from auto_rc_car_demos.basic_camera import BasicCameraCalc, HandCodedLaneFollower
 from auto_rc_car_demos.lidar_calc import LidarCalc
 
 
@@ -17,6 +17,7 @@ if __name__ == "__main__":
                                             rospy.get_param("client_comm_type"))
     basic_cam_calc = BasicCameraCalc()
     lidar_calc = LidarCalc()
+    lane_follower = HandCodedLaneFollower()
 
     print("Starting")
     dist = 0
@@ -55,10 +56,16 @@ if __name__ == "__main__":
         newY = int(img_size[0]*img_scale)
         img_red = cv2.resize(img, (newX, newY))
 
+
+
         # Get centroid of black pixels, use for steering
         centroid_x = basic_cam_calc.get_black_centroid(img_red, scaled_by=img_scale)
         centroid_percentage = (centroid_x / float(cols) - 0.5) * 2.0
         control_ang = -centroid_percentage * 0.25
+
+        # OR
+
+        control_ang = lane_follower.follow_lane(img)
 
         # Slow down if turning
         steer_speed_scale = 1.0 / (20.0 * control_ang*control_ang + 1.0)
