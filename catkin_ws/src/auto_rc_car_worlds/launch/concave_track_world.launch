@@ -12,36 +12,34 @@
   <param name="track_description" command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/concave_track.xacro.urdf" />
   <node name="spawn_track_urdf" pkg="gazebo_ros" type="spawn_model" args="-param track_description -x 0.0 -y -3.0 -z 0.00 -Y 1.57 -urdf -model circle_track --verbose" respawn="false" output="screen"/>
 
-  <group ns="sign0">
-    <param name="robot_description" command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/stoplight.xacro.urdf" />
 
-    <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -x 5.0 -y -2.0 -z 0.00 -Y 3.1415 -urdf -model stoplight0" respawn="false" output="screen"/>
-    <rosparam  command="load" file="$(find auto_rc_car_worlds)/config/stoplight_controller.yaml"/>
-    <node name="world_controller_spawner"
-      pkg="controller_manager"
-      type="spawner"
-      output="screen"
-      args="stoplight_controller">
-    </node>
-  </group>
+  <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
+    <arg name="ns" value="sign0"/>
+    <arg name="x" value="5.0"/>
+    <arg name="y" value="-2.0"/>
+    <arg name="yaw" value="3.1415"/>
+  </include>
 
-  <group ns="sign1">
-    <param name="robot_description" command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/stoplight.xacro.urdf" />
+  <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
+    <arg name="ns" value="sign1"/>
+    <arg name="x" value="0"/>
+    <arg name="y" value="-12.5"/>
+    <arg name="yaw" value="0"/>
+  </include>
 
-    <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -x -0 -y -12.5 -z 0.00 -Y 0 -urdf -model stoplight1 --verbose" respawn="false" output="screen"/>
-    <rosparam  command="load" file="$(find auto_rc_car_worlds)/config/stoplight_controller.yaml"/>
-    <node name="world_controller_spawner"
-      pkg="controller_manager"
-      type="spawner"
-      output="screen"
-      args="stoplight_controller">
-    </node>
-  </group>
+  <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
+    <arg name="ns" value="sign2"/>
+    <arg name="x" value="-18.5"/>
+    <arg name="y" value="-0"/>
+    <arg name="yaw" value="-1.5707"/>
+  </include>
+<!--
+
   
   <group ns="sign2">
     <param name="robot_description" command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/stoplight.xacro.urdf" />
 
-    <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -x -18.5 -y -0.0 -z 0.00 -Y -1.5707 -urdf -model stoplight2 --verbose" respawn="false" output="screen"/>
+    <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -x -18.5 -y -0.0 -z 0.00 -Y -1.5707 -urdf -model stoplight2 -verbose" respawn="false" output="screen"/>
     <rosparam  command="load" file="$(find auto_rc_car_worlds)/config/stoplight_controller.yaml"/>
     <node name="world_controller_spawner"
       pkg="controller_manager"
@@ -50,4 +48,5 @@
       args="stoplight_controller">
     </node>
   </group>
+  -->
 </launch>

@@ -6,5 +6,5 @@ joint_state_controller:
 # Position Controllers ---------------------------------------
 stoplight_controller:
   joint: light_joint
-  type: effort_controllers/JointPositionController
+  type: position_controllers/JointPositionController
   pid: {p: 5.0, i: 0.0, d: 5}
