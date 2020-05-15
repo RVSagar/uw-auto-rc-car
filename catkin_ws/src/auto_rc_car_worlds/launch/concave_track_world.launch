@@ -31,7 +31,14 @@
     <arg name="ns" value="sign2"/>
     <arg name="x" value="-18.5"/>
     <arg name="y" value="-0"/>
-    <arg name="yaw" value="-1.5707"/>
+    <arg name="yaw" value="1.5707"/>
+  </include>
+
+  <include file="$(find auto_rc_car_worlds)/launch/load_pedestrian.launch">
+    <arg name="ns" value="pedestrian0"/>
+    <arg name="x" value="-17"/>
+    <arg name="y" value="1"/>
+    <arg name="yaw" value="3.1415"/>
   </include>
 <!--
 
