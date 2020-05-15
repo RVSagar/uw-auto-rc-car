@@ -98,6 +98,7 @@ class AutoRCCarClientLocal(AutoRCCarClientBase):
         #self.control_pub = rospy.Publisher('/racecar/api_internal/control', carSteering, queue_size=3)
 
         print("Client Initialized")
+        rospy.sleep(3.0) #sleep to allow publishers to establish connection to subscribers
 
     def send_control(self, speed, steer):
         msg = carSteering()
