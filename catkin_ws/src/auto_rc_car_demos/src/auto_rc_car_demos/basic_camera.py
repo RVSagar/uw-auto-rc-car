@@ -61,7 +61,7 @@ class HandCodedLaneFollower():
         #    self.car.front_wheels.turn(self.curr_steering_angle)
 	
         curr_heading_image = self.display_heading_line(frame, self.curr_steering_angle)
-        self.show_image("heading", curr_heading_image)
+        #self.show_image("heading", curr_heading_image)
 
         return curr_heading_image, final_steering_angle
         
@@ -93,7 +93,7 @@ class HandCodedLaneFollower():
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #self.show_image("hsv", hsv)
         mask = cv2.inRange(hsv, WHITE_MIN, WHITE_MAX)
-        self.show_image("black mask", mask)
+        #self.show_image("black mask", mask)
 
         # detect edges
         edges = cv2.Canny(mask, 200, 400)
