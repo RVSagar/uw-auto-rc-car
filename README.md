@@ -8,6 +8,8 @@ This platform will allow students to delve into:
 - Software and algorithm development
 - IoT
 
+This repository holds some documentation for the electrical and mechanical design but is mainly a set of ROS packages to interface with the car platform in simulation or real life.
+
 TLDR Quick start guide to test lane following in simulation:
 1. Go to root folder
 2. `git submodule update --init --recursive`
