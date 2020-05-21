@@ -1,4 +1,4 @@
-# UW Engineering IDEAs Clinic Autonomous Vehicle Education Platform
+## UW Engineering IDEAs Clinic Autonomous Vehicle Educational Platform
 
 This project is being developed as an educational platform for undergraduate students to get exposure into the domain of autonomous vehicles.
 
