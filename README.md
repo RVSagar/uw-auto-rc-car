@@ -1,5 +1,12 @@
-# uw-auto-rc-car
-Autonomous RC car project for a future University of Waterloo Mechatronics course.
+# UW Engineering IDEAs Clinic Autonomous Vehicle Education Platform
+
+This project is being developed as an educational platform for undergraduate students to get exposure into the domain of autonomous vehicles.
+
+This platform will allow students to delve into:
+- Mechanical Design
+- Electrical system integration
+- Software and algorithm development
+- IoT
 
 TLDR Quick start guide to test lane following in simulation:
 1. Go to root folder
