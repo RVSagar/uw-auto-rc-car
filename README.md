@@ -1,4 +1,4 @@
-## UW Engineering IDEAs Clinic Autonomous Vehicle Educational Platform
+# UW Engineering IDEAs Clinic Autonomous Vehicle Educational Platform
 
 This project is being developed as an educational platform for undergraduate students to get exposure into the domain of autonomous vehicles.
 
@@ -10,7 +10,7 @@ This platform will allow students to delve into:
 
 This repository holds some documentation for the electrical and mechanical design but is mainly a set of ROS packages to interface with the car platform in simulation or real life.
 
-### TLDR Quick start guide to test lane following in simulation:
+## TLDR Quick start guide to test lane following in simulation:
 1. Go to root folder
 2. `git submodule update --init --recursive`
 3. `make`
@@ -22,7 +22,7 @@ This repository holds some documentation for the electrical and mechanical desig
 9. `roslaunch auto_rc_car_demos simple_lane_demo_sim.launch` to launch Gazebo and rviz
 10. Open a new terminal and type `rosrun auto_rc_car_demos simple_lane_drive.py`
 
-### Component Overview
+## Component Overview
 - `auto_rc_car_api`: core package that contains custom messages, services and nodes to interface with a simulated or real car
 - `auto_rc_car_control`: controllers for simulating the car in Gazebo
 - `auto_rc_car_demos`: demo nodes and launch files for lane-following and obstacle avoidance
