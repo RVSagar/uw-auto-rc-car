@@ -4,17 +4,23 @@ import numpy as np
 import logging
 
 
+_SHOW_IMAGE = True
+#BLACK_MIN = np.array([0, 0, 0],np.uint8)
+#BLACK_MAX = np.array([180, 255, 90],np.uint8)
+sensitivity = 40
+lower_white = np.array([0,0,255-sensitivity])
+upper_white = np.array([255,sensitivity,255])
 
-_SHOW_IMAGE = False
-BLACK_MIN = np.array([0, 0, 0],np.uint8)
-BLACK_MAX = np.array([180, 255, 90],np.uint8)
+WHITE_MIN = np.array(lower_white,np.uint8)
+WHITE_MAX = np.array(upper_white,np.uint8)
+
 BASE_SPEED = 5
 STEERING_OFFSET = 0
 TIMEOUT = 15
 MAX_ANGLE_DEV_1_LINE = 1
-MAX_ANGLE_DEV_2_LINES = 6 
+MAX_ANGLE_DEV_2_LINES = 4 
 IMG_SCALE = 0.25
-ROI = 0.5
+ROI = 0.75
 K_DT = 2
 STEER_SCALE = 26
 
@@ -27,14 +33,14 @@ class HandCodedLaneFollower():
 
     def follow_lane(self, frame):
         # Main entry point of the lane follower
-        #show_image("orig", frame)
+        #self.show_image("orig", frame)
 
         lane_lines, frame = self.detect_lane(frame)
         final_frame, final_steering_angle = self.steer(frame, lane_lines)
 
         return final_frame, final_steering_angle
 
-    def convert_to_VESC_steer(self, steering_angle):
+    def convert_to_api_steer(self, steering_angle):
         final_steering_angle = -((steering_angle - 90.0)/90.0)
         return final_steering_angle - STEERING_OFFSET #between -1 (right) and 1 (left)
 
@@ -43,18 +49,18 @@ class HandCodedLaneFollower():
         if len(lane_lines) == 0:
             logging.error('No lane lines detected, nothing to do.')
             print("No lane lines detected, nothing to do.")
-            return frame, self.curr_steering_angle
+            return frame, self.convert_to_api_steer(self.curr_steering_angle)
 
         new_steering_angle = self.compute_steering_angle(frame, lane_lines)
         self.curr_steering_angle = self.stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
         print("Steering Angle in degrees: ", self.curr_steering_angle)
-        final_steering_angle = self.curr_steering_angle
+        final_steering_angle = self.convert_to_api_steer(self.curr_steering_angle)
 
         #if self.car is not None:
         #    self.car.front_wheels.turn(self.curr_steering_angle)
 	
         curr_heading_image = self.display_heading_line(frame, self.curr_steering_angle)
-        self.show_image("heading", curr_heading_image)
+        #self.show_image("heading", curr_heading_image)
 
         return curr_heading_image, final_steering_angle
         
@@ -84,9 +90,9 @@ class HandCodedLaneFollower():
     def detect_edges(self, frame):
         # filter for black lane lines
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        #show_image("hsv", hsv)
-        mask = cv2.inRange(hsv, BLACK_MIN, BLACK_MAX)
-        #show_image("black mask", mask)
+        #self.show_image("hsv", hsv)
+        mask = cv2.inRange(hsv, WHITE_MIN, WHITE_MAX)
+        #self.show_image("black mask", mask)
 
         # detect edges
         edges = cv2.Canny(mask, 200, 400)
@@ -108,7 +114,7 @@ class HandCodedLaneFollower():
         ]], np.int32)
 
         cv2.fillPoly(mask, polygon, 255)
-        #show_image("mask", mask)
+        #self.show_image("mask", mask)
         masked_image = cv2.bitwise_and(canny, mask)
         return masked_image
     
@@ -273,7 +279,7 @@ class HandCodedLaneFollower():
     def show_image(self, title, frame, show=_SHOW_IMAGE):
         if show:
             cv2.imshow(title, frame)
-
+            cv2.waitKey(1)
 
     def make_points(self, frame, line):
         height, width, _ = frame.shape

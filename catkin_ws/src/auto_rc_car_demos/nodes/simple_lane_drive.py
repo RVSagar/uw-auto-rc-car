@@ -15,6 +15,7 @@ from auto_rc_car_demos.lidar_calc import LidarCalc
 if __name__ == "__main__":
     car = ClientGenerator.CreateRCCarClient(rospy.get_param("client_context_type"),
                                             rospy.get_param("client_comm_type"))
+
     basic_cam_calc = BasicCameraCalc()
     lidar_calc = LidarCalc()
     lane_follower = HandCodedLaneFollower()
@@ -23,7 +24,8 @@ if __name__ == "__main__":
     dist = 0
 
     threshold = 15
-    base_speed = 8.0
+    base_speed = 8.0 #8.0
+    steer_speed_scale = 26.0 #20.0
 
     t_start = rospy.Time.now()
     timeout = rospy.get_param("timeout", -1)
@@ -40,8 +42,10 @@ if __name__ == "__main__":
         img = car.camera_to_cv_image(img)
         lidar, dt2 = car.get_latest_lidar()
 
+        #cv2.imshow("Image", img)
+
         # Slow down if it has been 'a while' since last loop
-        dt_speed_scale = 1.0 / (1 + 50* dt)
+        dt_speed_scale = 1.0 / (1 + 2* dt) #50
         
 
         if img is None:
@@ -55,8 +59,9 @@ if __name__ == "__main__":
         newX = int(img_size[1]*img_scale)
         newY = int(img_size[0]*img_scale)
         img_red = cv2.resize(img, (newX, newY))
+        #img_red = img
 
-
+        #cv2.imshow("Image reduced", img_red)
 
         # Get centroid of black pixels, use for steering
         centroid_x = basic_cam_calc.get_black_centroid(img_red, scaled_by=img_scale)
@@ -65,11 +70,10 @@ if __name__ == "__main__":
 
         # OR
 
-        _, control_ang = lane_follower.follow_lane(img)
-        control_ang = control_ang * 3.1415 / 180.0
+        final_frame , control_ang = lane_follower.follow_lane(img)
 
         # Slow down if turning
-        steer_speed_scale = 1.0 / (20.0 * control_ang*control_ang + 1.0)
+        steer_speed_scale = 1.0 / (steer_speed_scale * control_ang*control_ang + 1.0)
 
         # Detect street lights
         c, c_mag = basic_cam_calc.detect_sign(img_red)
@@ -123,27 +127,35 @@ if __name__ == "__main__":
         lidar_speed_scale = lidar_front_speed_scale * lidar_left_speed_scale * lidar_right_speed_scale
         speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
 
-        print("")
-        print("dt=%f" % dt)
+        
+        # print("")
+        # print("dt=%f" % dt)
         print("speed=%f" % speed)
         print("steer_ang=%f" % control_ang)
-        print("x_centroid=%f" % centroid_x)
-        print("black centroid=%f" % centroid_percentage)
-        print("c=%s" % c)
-        print("c_mag=%f" % c_mag)
-        print("dist_front_left=%f" % dist_front_left)
-        print("dist_front_right=%f" % dist_front_right)
-        print("dist_left=%f" % dist_left)
-        print("dist_right=%f" % dist_right)
+        # print("x_centroid=%f" % centroid_x)
+        # print("black centroid=%f" % centroid_percentage)
+        # print("c=%s" % c)
+        # print("c_mag=%f" % c_mag)
+        # print("dist_front_left=%f" % dist_front_left)
+        # print("dist_front_right=%f" % dist_front_right)
+        # print("dist_left=%f" % dist_left)
+        # print("dist_right=%f" % dist_right)
+        
         
         # Send control
         if abs(speed) < 0.1:
             car.brake()
         else:
             car.send_control(speed, control_ang)
+    
+    #try to stop car on shutdown of script...doesn't seem to work?
+    def shutdown():
+        print ("shutdown time!")
+        # Extra brake at end
+        car.brake()
+        car.send_control(0, 0)
+
+    rospy.on_shutdown(shutdown)
 
     # Extra brake at end
     car.brake()
-
-
-
