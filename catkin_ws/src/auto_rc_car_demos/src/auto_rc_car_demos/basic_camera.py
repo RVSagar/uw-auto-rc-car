@@ -1,7 +1,7 @@
 import cv2
 import math
 import numpy as np
-
+import logging
 
 
 
@@ -42,7 +42,7 @@ class HandCodedLaneFollower():
         logging.debug('steering...')
         if len(lane_lines) == 0:
             logging.error('No lane lines detected, nothing to do.')
-	        print("No lane lines detected, nothing to do.")
+            print("No lane lines detected, nothing to do.")
             return frame, self.curr_steering_angle
 
         new_steering_angle = self.compute_steering_angle(frame, lane_lines)

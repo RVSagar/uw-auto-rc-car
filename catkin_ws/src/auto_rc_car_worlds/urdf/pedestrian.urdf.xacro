@@ -46,7 +46,7 @@
     <parent link="base_link"/>
     <child link="pedestrian_link"/>
     <axis xyz="1 0 0" />
-    <limit effort="1000" velocity="1000" lower="0" upper="10"/>
+    <limit effort="100000" velocity="1000" lower="0" upper="10"/>
 </joint>
 
 <transmission name="pedestrian_joint_transmission" type="SimpleTransmission">

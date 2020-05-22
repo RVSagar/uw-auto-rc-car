@@ -81,7 +81,7 @@ if __name__ == "__main__":
     light2 = StopLight("sign2", 10, 10)
     stoplights = [light0, light1, light2]
 
-    ped0 = Pedestrian("pedestrian0", [0, 4, 4, 0], [0, 10, 20, 30])
+    ped0 = Pedestrian("pedestrian0", [0, 0, 5, 5, 0], [0, 10, 20, 30, 40])
     pedestrians = [ped0]
 
     c = WorldController(stoplights, pedestrians)

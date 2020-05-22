@@ -31,7 +31,7 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         
         # Exit conditions
-        if timeout > 0 and (rospy.Time.now() - t_start).to_sec() > timeout:
+        if timeout > 0 and (rospy.Time.now() - t_start).to_sec() > timeout or rospy.is_shutdown():
             car.send_control(0,0)
             break
 
@@ -65,7 +65,8 @@ if __name__ == "__main__":
 
         # OR
 
-        control_ang = lane_follower.follow_lane(img)
+        _, control_ang = lane_follower.follow_lane(img)
+        control_ang = control_ang * 3.1415 / 180.0
 
         # Slow down if turning
         steer_speed_scale = 1.0 / (20.0 * control_ang*control_ang + 1.0)
@@ -96,7 +97,7 @@ if __name__ == "__main__":
             front_limit = 1.5
 
             def dist_too_close(dist, close_limit):
-                if dist > 0 and dist < close_limit:
+                if dist > 1e-3 and dist < close_limit:
                     return True
                 return False
 
@@ -142,7 +143,7 @@ if __name__ == "__main__":
             car.send_control(speed, control_ang)
 
     # Extra brake at end
-    car.send_control(0, 0)
+    car.brake()
 
 
 
