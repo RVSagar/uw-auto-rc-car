@@ -62,5 +62,5 @@ RUN apt-get update && \
 
 # setup entrypoint
 COPY ./docker/docker_entrypoint.sh /
-ENTRYPOINT ["/docker_entrypoint.sh"]
-CMD ["bash"]
+ADD ./.bashrc /root/.bashrc
+

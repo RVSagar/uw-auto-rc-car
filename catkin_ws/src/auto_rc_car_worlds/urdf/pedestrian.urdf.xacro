@@ -181,6 +181,7 @@
 <gazebo>
   <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
     <robotNamespace>${pedestrian_ns}</robotNamespace>
+    <legacyModeNS>false</legacyModeNS>
   </plugin>
 </gazebo>
 
