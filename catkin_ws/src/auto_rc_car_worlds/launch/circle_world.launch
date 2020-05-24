@@ -9,6 +9,13 @@
     <arg name="debug" value="false"/>
   </include>
 
+  <include file="$(find auto_rc_car_description)/launch/spawn_car.launch">
+    <arg name="x" value="0.0"/>
+    <arg name="y" value="-0.25"/>
+    <arg name="yaw" value="0.0"/>
+  </include>
+  <include file="$(find auto_rc_car_control)/launch/start_car_sim_controls.launch"/>
+
   <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
     <arg name="ns" value="sign0"/>
     <arg name="x" value="4.0"/>

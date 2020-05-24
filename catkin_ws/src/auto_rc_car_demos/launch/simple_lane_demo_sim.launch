@@ -1,16 +1,14 @@
 <launch>
     <!--name of gazebo launch file, without '_world.launch'-->
-    <arg name="world_name" default="circle_track"/>
+    <arg name="world" default="lane"/>
     <arg name="viz_type" default="local"/>
-    <arg name="run_as_remote" default="true"/>
+    <arg name="run_as_remote" default="false"/>
     <arg name="run_client" default="true"/>
     <arg name="timeout" default="-1"/>
 
     <param name="client_comm_type" value="local"/>
     <param name="client_context_type" value="sim"/>
-    <include file="$(find auto_rc_car_worlds)/launch/$(arg world_name)_world.launch"/>
-    <include file="$(find auto_rc_car_description)/launch/spawn_car.launch"/>
-    <include file="$(find auto_rc_car_control)/launch/start_car_sim_controls.launch"/>
+    <include file="$(find auto_rc_car_worlds)/launch/$(arg world)_world.launch"/>
 
 
     <include file="$(find auto_rc_car_description)/launch/viz_car_$(arg viz_type).launch"/>
