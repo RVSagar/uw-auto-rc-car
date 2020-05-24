@@ -1,0 +1,80 @@
+FROM dorowu/ubuntu-desktop-lxde-vnc:xenial
+
+RUN apt-get update -y 
+RUN apt-get install dirmngr -y 
+
+# Install basic useful programs
+# Some are just for testing that the docker image was built correctly
+RUN apt-get update && \
+    apt-get install apt-transport-https && \
+    rm -rf /var/lib/apt/lists/*
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' && \
+    apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 && \ 
+    apt-get update && \
+    apt-get install -y \
+      curl \
+      build-essential \
+      cmake \
+      software-properties-common \
+      psmisc \
+      vim \
+      gedit \
+      sudo \
+      python-pip \
+      net-tools\
+      dnsutils\
+      iputils-ping\
+      git-all && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install ROS
+RUN apt-get update && apt-get install -y ros-kinetic-desktop-full \
+		wget git nano
+RUN rosdep init && rosdep update
+
+# Update Gazebo 7
+RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+RUN wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+RUN apt-get update && apt-get install -y gazebo7 libignition-math2-dev
+
+# Install Required ROS Packages and Tools
+RUN apt-get update && \
+    apt-get install -y \
+      python-catkin-tools \
+      ros-kinetic-gazebo-ros-pkgs \
+      ros-kinetic-gazebo-ros-control \
+      ros-kinetic-joint-state-controller \
+      ros-kinetic-robot-state-publisher \
+      ros-kinetic-xacro \
+      ros-kinetic-teleop-twist-keyboard \
+      ros-kinetic-effort-controllers \
+      ros-kinetic-message-to-tf \
+      ros-kinetic-rplidar-ros \
+      ros-kinetic-serial \ 
+      ros-kinetic-ackermann-msgs \
+      ros-kinetic-rviz && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# Install ASTRA camera
+# https://astra-wiki.readthedocs.io/en/latest/installation.html
+# https://www.dropbox.com/sh/ou49febb83m476d/AADqCQuI3agPOdhyuihl0NHMa?dl=0
+RUN mkdir -p /workspace
+ADD ./Astra_Installation/2-Linux /workspace/2-Linux
+RUN cd /workspace/2-Linux && \
+    unzip OpenNI-Linux-x64-2.3.zip -d /workspace/OpenNi && \
+    cd /workspace/OpenNi/OpenNI-Linux-x64-2.3 && \
+    chmod a+x install.sh && \
+    ./install.sh && \
+    chmod a+rwx -R /workspace/OpenNi
+RUN apt-get update && \
+    apt-get install -y \
+      ros-kinetic-libuvc* \
+      ros-kinetic-astra-camera \
+      ros-kinetic-astra-launch && \
+    rm -rf /var/lib/apt/lists/*
+
+#setup entrypoint
+#COPY ./docker/docker_entrypoint.sh /
+#ENTRYPOINT ["/docker_entrypoint.sh"]
+#CMD ["bash"]
