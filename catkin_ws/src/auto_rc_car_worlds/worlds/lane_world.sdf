@@ -102,7 +102,7 @@
 <width>0.917500</width>
 <point>-0.440000 0.000000 0.000000</point>
 <point>18.750000 0.000000 0.000000</point>
-</road>
+<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri><name>OurRoad</name></script><shader type='normal_map_tangent_space'><normal_map>road1.png</normal_map></shader></material></road>
 <model name='House 1_1'>      <static>1</static>
       <link name='link'>
         <collision name='collision'>

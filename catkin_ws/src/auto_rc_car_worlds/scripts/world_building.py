@@ -43,6 +43,16 @@ class WorldBuilder:
             x = pt[0]
             y = pt[1]
             contents.append("<point>%f %f %f</point>\n" % (x*self.world_scale, y*self.world_scale, 0))
+        contents.append("<material>")
+        contents.append("<script>")
+        contents.append("<uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri>")
+        #contents.append("<uri>package://auto_rc_car_worlds/materials/textures/road2.png</uri>")
+        contents.append("<name>OurRoad</name>")
+        contents.append("</script>")
+        contents.append("<shader type='normal_map_tangent_space'>")
+        contents.append("<normal_map>road1.png</normal_map>")
+        contents.append("</shader>")
+        contents.append("</material>")
         contents.append("</road>\n")
         return contents
 
