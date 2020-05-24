@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<robot name="stoplight" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:arg name="pedestrian_ns" default="pedestrian_0"/>
+<xacro:property name="pedestrian_ns" value="$(arg pedestrian_ns)"/>
+
+<xacro:property name="scale" value="0.5" />
+
+<link name="world" />
+<joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+</joint>
+
+<link name="base_link">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${0.1*scale} ${0.1*scale}  ${0.1*scale} " />
+        </geometry>
+        <material name="Black">
+            <color rgba="1 0.0 1 1.0"/>
+        </material>
+    </visual>
+    <visual>
+        <origin xyz="${0.1*scale}  0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="${0.05*scale}  ${0.05*scale} ${0.05*scale}" />
+        </geometry>
+        <material name="Black">
+            <color rgba="1 0.0 1 1.0"/>
+        </material>
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="10000"/>
+      <inertia
+        ixx="10000.0" ixy="0.0" ixz="0.0"
+        iyy="10000.0" iyz="0.0"
+        izz="10000.0"/>
+    </inertial>
+</link>
+
+<joint name="pedestrian_joint" type="prismatic">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="pedestrian_link"/>
+    <axis xyz="1 0 0" />
+    <limit effort="100000" velocity="1000" lower="0" upper="10"/>
+</joint>
+
+<transmission name="pedestrian_joint_transmission" type="SimpleTransmission">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="pedestrian_joint">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="pedestrian_joint_motor">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+<xacro:macro name="vc_link" params="*origin *geometry">
+    <visual>
+        <xacro:insert_block name="origin" />
+        <xacro:insert_block name="geometry"/>
+    </visual>
+    <collision>
+        <xacro:insert_block name="origin" />
+        <xacro:insert_block name="geometry"/>
+    </collision>
+</xacro:macro>
+
+<xacro:macro name="def_mass">
+    <inertial>
+      <mass value="1"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0"/>
+    </inertial>
+</xacro:macro>
+
+<xacro:property name="leg_height" value="${0.8*scale}"/>
+<xacro:property name="leg_rad" value="${0.08*scale}"/>
+<xacro:property name="torso_height" value="${0.6*scale}"/>
+<xacro:property name="torso_rad" value="${0.2*scale}"/>
+<xacro:property name="head_rad" value="${0.1*scale}"/>
+
+<xacro:property name="arm_length" value="${0.7*scale}"/>
+<xacro:property name="arm_rad" value="${0.05*scale}"/>
+
+
+<link name="pedestrian_link">
+    <xacro:def_mass />
+</link>
+
+<joint name="lower_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="pedestrian_link"/>
+    <child link="lower_body"/>
+</joint>
+<joint name="upper_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="pedestrian_link"/>
+    <child link="upper_body"/>
+</joint>
+<joint name="head_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="pedestrian_link"/>
+    <child link="head"/>
+</joint>
+
+
+<link name="lower_body">
+    <xacro:def_mass />
+    <xacro:vc_link>
+        <origin xyz="${1.5*leg_rad} 0 ${0.5*1.01*leg_height}" rpy="0 0 0"/>
+        <geometry>
+            <cylinder radius="${leg_rad}" length="${leg_height}"/>
+        </geometry>
+    </xacro:vc_link>
+
+    <xacro:vc_link>
+        <origin xyz="${-1.5*leg_rad} 0 ${0.5*1.01*leg_height}" rpy="0 0 0"/>
+        <geometry>
+            <cylinder radius="${leg_rad}" length="${leg_height}"/>
+        </geometry>
+    </xacro:vc_link>
+</link>
+
+<link name="head">
+    <xacro:def_mass />
+    <xacro:vc_link>
+        <origin xyz="0 0 ${torso_height + leg_height + 1.25*head_rad}" rpy="0 0 0"/>
+        <geometry>
+            <sphere radius="${head_rad}"/>
+        </geometry>
+    </xacro:vc_link>
+</link>
+
+<link name="upper_body">
+    <xacro:def_mass />
+    <xacro:vc_link>
+        <origin xyz="0 0 ${0.5*torso_height + leg_height}" rpy="0 0 0"/>
+        <geometry>
+            <cylinder radius="${torso_rad}" length="${torso_height}"/>
+        </geometry>
+    </xacro:vc_link>
+
+    <xacro:vc_link>
+        <origin xyz="${-1.5*arm_rad - torso_rad} 0 ${torso_height + leg_height - 0.5*arm_length}" rpy="0 0.15 0"/>
+        <geometry>
+            <cylinder radius="${arm_rad}" length="${arm_length}"/>
+        </geometry>
+    </xacro:vc_link>
+
+    <xacro:vc_link>
+        <origin xyz="${1.5*arm_rad + torso_rad} 0 ${torso_height + leg_height - 0.5*arm_length}" rpy="0 -0.15 0"/>
+        <geometry>
+            <cylinder radius="${arm_rad}" length="${arm_length}"/>
+        </geometry>
+    </xacro:vc_link>
+
+    
+</link>
+
+
+<gazebo reference="upper_body">
+    <material>Gazebo/Red</material>
+</gazebo>
+<gazebo reference="lower_body">
+    <material>Gazebo/Blue</material>
+</gazebo>
+
+<gazebo reference="base_link">
+    <material>Gazebo/Black</material>
+    <static>true</static>
+</gazebo>
+
+<gazebo>
+  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    <robotNamespace>${pedestrian_ns}</robotNamespace>
+    <legacyModeNS>false</legacyModeNS>
+  </plugin>
+</gazebo>
+
+
+
+</robot>

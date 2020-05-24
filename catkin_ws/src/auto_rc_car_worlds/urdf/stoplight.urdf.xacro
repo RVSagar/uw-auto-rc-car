@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 <robot name="stoplight" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:property name="pole_height" value="0.5" />
-<xacro:property name="sign_radius" value="0.2" />
+<xacro:arg name="light_ns" default="sign0"/>
+<xacro:property name="light_ns" value="$(arg light_ns)"/>
+
+<xacro:arg name="scale" default="1.0"/>
+<xacro:property name="scale" value="$(arg scale)"/>
+
+<xacro:property name="pole_height" value="${0.5*scale}" />
+<xacro:property name="sign_radius" value="${0.2*scale}" />
 
 <link name="world" />
 <joint name="fixed" type="fixed">
@@ -41,10 +47,10 @@
 <transmission name="light_joint_transmission" type="SimpleTransmission">
   <type>transmission_interface/SimpleTransmission</type>
   <joint name="light_joint">
-    <hardwareInterface>EffortJointInterface</hardwareInterface>
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
   </joint>
   <actuator name="light_joint_motor">
-    <hardwareInterface>EffortJointInterface</hardwareInterface>
+    <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
     <mechanicalReduction>1</mechanicalReduction>
   </actuator>
 </transmission>
@@ -122,7 +128,8 @@
 
 <gazebo>
   <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-    <robotNamespace>/sign</robotNamespace>
+    <robotNamespace>${light_ns}</robotNamespace>
+    <legacyModeNS>false</legacyModeNS>
   </plugin>
 </gazebo>
 

@@ -99,37 +99,37 @@
     </gui>
     
 <road name='gen_road1'>
-<width>3.670000</width>
-<point>-1.760000 0.000000 0.000000</point>
-<point>20.000000 0.000000 0.000000</point>
+<width>0.917500</width>
+<point>-0.440000 0.000000 0.000000</point>
+<point>5.000000 0.000000 0.000000</point>
 </road>
 <road name='gen_road2'>
-<width>3.670000</width>
-<point>0.000000 -1.760000 0.000000</point>
-<point>0.000000 20.000000 0.000000</point>
+<width>0.917500</width>
+<point>0.000000 -0.440000 0.000000</point>
+<point>0.000000 5.000000 0.000000</point>
 </road>
 <road name='gen_road3'>
-<width>3.670000</width>
-<point>20.000000 -1.760000 0.000000</point>
-<point>20.000000 21.760000 0.000000</point>
+<width>0.917500</width>
+<point>5.000000 -0.440000 0.000000</point>
+<point>5.000000 5.440000 0.000000</point>
 </road>
 <road name='gen_road4'>
-<width>3.670000</width>
-<point>-1.760000 20.000000 0.000000</point>
-<point>21.760000 20.000000 0.000000</point>
+<width>0.917500</width>
+<point>-0.440000 5.000000 0.000000</point>
+<point>5.440000 5.000000 0.000000</point>
 </road>
 <road name='gen_road5'>
-<width>3.670000</width>
-<point>20.000000 0.000000 0.000000</point>
-<point>23.420105 0.603039 0.000000</point>
-<point>26.427718 2.339423 0.000000</point>
-<point>28.660100 4.999733 0.000000</point>
-<point>29.848006 8.263113 0.000000</point>
-<point>29.848167 11.735975 0.000000</point>
-<point>28.660563 14.999465 0.000000</point>
-<point>26.428428 17.659981 0.000000</point>
-<point>23.420975 19.396644 0.000000</point>
-<point>20.000927 20.000000 0.000000</point>
+<width>0.917500</width>
+<point>5.000000 0.000000 0.000000</point>
+<point>5.855026 0.150760 0.000000</point>
+<point>6.606930 0.584856 0.000000</point>
+<point>7.165025 1.249933 0.000000</point>
+<point>7.462002 2.065778 0.000000</point>
+<point>7.462042 2.933994 0.000000</point>
+<point>7.165141 3.749866 0.000000</point>
+<point>6.607107 4.414995 0.000000</point>
+<point>5.855244 4.849161 0.000000</point>
+<point>5.000232 5.000000 0.000000</point>
 </road>
 <model name='House 1_1'>      <static>1</static>
       <link name='link'>
@@ -137,7 +137,7 @@
           <geometry>
             <mesh>
               <uri>model://house_1/meshes/house_1.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -157,7 +157,7 @@
           <geometry>
             <mesh>
               <uri>model://house_1/meshes/house_1.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <material>
             <script>
@@ -174,14 +174,14 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-<pose frame=''>5.000000 5.000000 0 0 -0 0.000000</pose>
+<pose frame=''>1.250000 1.250000 0 0 -0 0.000000</pose>
     </model><model name='House 1_2'>      <static>1</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
             <mesh>
               <uri>model://house_1/meshes/house_1.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -201,7 +201,7 @@
           <geometry>
             <mesh>
               <uri>model://house_1/meshes/house_1.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <material>
             <script>
@@ -218,14 +218,14 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-<pose frame=''>7.500000 15.000000 0 0 -0 3.141500</pose>
+<pose frame=''>1.875000 3.750000 0 0 -0 3.141500</pose>
     </model><model name='House 2_3'>      <static>1</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
             <mesh>
               <uri>model://house_2/meshes/house_2.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -245,7 +245,7 @@
           <geometry>
             <mesh>
               <uri>model://house_2/meshes/house_2.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <material>
             <script>
@@ -262,14 +262,14 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-<pose frame=''>15.000000 12.500000 0 0 -0 1.570700</pose>
+<pose frame=''>3.750000 3.125000 0 0 -0 1.570700</pose>
     </model><model name='House 3_4'>      <static>1</static>
       <link name='link'>
         <collision name='collision'>
           <geometry>
             <mesh>
               <uri>model://house_3/meshes/house_3.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -289,7 +289,7 @@
           <geometry>
             <mesh>
               <uri>model://house_3/meshes/house_3.dae</uri>
-<scale>0.500000 0.500000 0.500000</scale>            </mesh>
+<scale>0.125000 0.125000 0.125000</scale>            </mesh>
           </geometry>
           <material>
             <script>
@@ -306,6 +306,6 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-<pose frame=''>25.000000 10.000000 0 0 -0 1.570700</pose>
+<pose frame=''>6.250000 2.500000 0 0 -0 1.570700</pose>
     </model>  </world>
 </sdf>

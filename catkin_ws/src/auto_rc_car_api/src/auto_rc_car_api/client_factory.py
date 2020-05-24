@@ -20,7 +20,7 @@ class ClientGenerator:
         controls = None
         if sim_real == Contexts.SIM:
             controls = SimulationControlModule(APIOnlyJoyListener())
-        elif sim_real == Contexts.SIM:
+        elif sim_real == Contexts.REAL:
             context = RealControlModule(TeleopJoyListener())
         else:
             raise Exception("Please provide context 'sim' or 'real' to creation function")

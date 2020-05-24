@@ -1,0 +1,10 @@
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+# Position Controllers ---------------------------------------
+pedestrian_controller:
+  joint: pedestrian_joint
+  type: effort_controllers/JointPositionController
+  pid: {p: 1000, i: 1, d: 25, i_clamp: 1 }

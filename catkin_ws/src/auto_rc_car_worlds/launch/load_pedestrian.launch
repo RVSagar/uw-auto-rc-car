@@ -1,0 +1,21 @@
+<launch>
+  <arg name="ns"/>
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="yaw" default="0"/> <!-- Yaw=0: Red points in +x direction -->
+
+  <group ns="$(arg ns)">
+    <param name="robot_description"
+           command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/pedestrian.urdf.xacro 'pedestrian_ns:=$(arg ns)'" />
+    <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model"
+          args="-param robot_description -x $(arg x) -y $(arg y) -z 0.001 -Y $(arg yaw) -urdf -model $(arg ns)" respawn="false" output="screen"/>
+    <rosparam  command="load" file="$(find auto_rc_car_worlds)/config/pedestrian_controller.yaml"/>
+    <node name="world_controller_spawner"
+      pkg="controller_manager"
+      type="spawner"
+      output="screen"
+      args="pedestrian_controller">
+    </node>
+  </group>
+  
+</launch>
