@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="stoplight" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:arg name="light_ns" default="sign0"/>
+<xacro:arg name="light_ns" default="undefinedNS"/>
 <xacro:property name="light_ns" value="$(arg light_ns)"/>
 
 <xacro:arg name="scale" default="1.0"/>

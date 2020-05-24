@@ -7,7 +7,7 @@
 
   <group ns="$(arg ns)">
     <param name="robot_description"
-           command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/stoplight.urdf.xacro 'light_ns:=$(arg ns) scale:=$(arg scale)' " />
+           command="$(find xacro)/xacro $(find auto_rc_car_worlds)/urdf/stoplight.urdf.xacro 'light_ns:=$(arg ns)' 'scale:=$(arg scale)' " />
     <node name="spawn_sign_urdf" pkg="gazebo_ros" type="spawn_model"
           args="-param robot_description -x $(arg x) -y $(arg y) -z 0.00 -Y $(arg yaw) -urdf -model $(arg ns)" respawn="false" output="screen"/>
     <rosparam  command="load" file="$(find auto_rc_car_worlds)/config/stoplight_controller.yaml"/>

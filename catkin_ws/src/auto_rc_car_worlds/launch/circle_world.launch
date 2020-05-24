@@ -1,0 +1,44 @@
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find auto_rc_car_worlds)/worlds/circle_world.sdf"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
+    <arg name="ns" value="sign0"/>
+    <arg name="x" value="4.0"/>
+    <arg name="y" value="0"/>
+    <arg name="yaw" value="0.4"/>
+    <arg name="scale" value="1.0"/>
+  </include>
+
+  <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
+    <arg name="ns" value="sign1"/>
+    <arg name="x" value="-4"/>
+    <arg name="y" value="0"/>
+    <arg name="yaw" value="-0.4"/>
+    <arg name="scale" value="1.0"/>
+  </include>
+
+
+  <include file="$(find auto_rc_car_worlds)/launch/load_pedestrian.launch">
+    <arg name="ns" value="pedestrian0"/>
+    <arg name="x" value="2"/>
+    <arg name="y" value="1.5"/>
+    <arg name="yaw" value="0.5"/>
+  </include>
+
+  <include file="$(find auto_rc_car_worlds)/launch/load_pedestrian.launch">
+    <arg name="ns" value="pedestrian1"/>
+    <arg name="x" value="-5"/>
+    <arg name="y" value="3"/>
+    <arg name="yaw" value="0.5"/>
+  </include>
+
+  <node name="circle_controller" pkg="auto_rc_car_worlds" type="circle_world_control.py"/>
+</launch>
