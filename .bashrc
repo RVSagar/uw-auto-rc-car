@@ -5,5 +5,6 @@ alias killros='killall -9 gazebo & killall -9 gzserver  & killall -9 gzclient & 
 
 source /usr/share/gazebo/setup.sh
 export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/wesley/catkin_ws/src/auto_rc_car_worlds/
-
+export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/wesley/catkin_ws/src/auto_rc_car_worlds/media
+export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/wesley/catkin_ws/src/auto_rc_car_worlds/media/materials
 echo ".bashrc sourced"

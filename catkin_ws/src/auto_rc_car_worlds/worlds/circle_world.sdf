@@ -200,7 +200,7 @@
 <point>8.066321 7.150273 0.000000</point>
 <point>8.111933 7.664392 0.000000</point>
 <point>8.124811 8.180369 0.000000</point>
-</road>
+<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri><name>OurRoad</name></script><shader type='normal_map_tangent_space'><normal_map>road1.png</normal_map></shader></material></road>
 <model name='House 1_1'>      <static>1</static>
       <link name='link'>
         <collision name='collision'>
