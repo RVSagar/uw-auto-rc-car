@@ -56,6 +56,43 @@ class WorldBuilder:
         contents.append("</road>\n")
         return contents
 
+    def generate_corner(self, x, y, theta):
+        return self.generate_road_connector(x,y,theta,"corner","Corner")
+
+    def generate_3way(self, x, y, theta):
+        return self.generate_road_connector(x,y,theta,"3wayintersection","3WayIntersection")
+
+    def generate_4way(self, x, y, theta):
+        return self.generate_road_connector(x,y,theta,"4wayintersection","WayIntersection")
+
+    def generate_road_connector(self, x, y, theta, filename, scriptname):
+        self.cur_road_id += 1
+        L = self.base_road_width * self.world_scale * 0.5
+        contents = []
+        contents.append("<road name='gen_road%d'>\n" % self.cur_road_id)
+        contents.append("<width>%f</width>\n" % (L*2))
+
+        x1 = x - L*math.sin(theta)
+        x2 = x + L*math.sin(theta)
+
+        y1 = y - L*math.cos(theta)
+        y2 = y + L*math.cos(theta)
+
+        contents.append("<point>%f %f %f</point>\n" % (x1, y1, 0))
+        contents.append("<point>%f %f %f</point>\n" % (x2, y2, 0))
+        contents.append("<material>")
+        contents.append("<script>")
+        contents.append("<uri>package://auto_rc_car_worlds/media/materials/scripts/%s.material</uri>" % filename)
+        #contents.append("<uri>package://auto_rc_car_worlds/materials/textures/road2.png</uri>")
+        contents.append("<name>%s</name>" % scriptname)
+        contents.append("</script>")
+        contents.append("<shader type='normal_map_tangent_space'>")
+        contents.append("<normal_map>%s.png</normal_map>" % filename)
+        contents.append("</shader>")
+        contents.append("</material>")
+        contents.append("</road>\n")
+        return contents
+
     def generate_house_contents(self, n, x, y, yaw):
         # n: 1, 2, or 3 (model of house)
         self.curr_home_id += 1
