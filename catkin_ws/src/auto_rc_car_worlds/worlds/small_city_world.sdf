@@ -48,6 +48,22 @@
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
+          <visual name="grass">
+            <pose>0 0 -0.1 0 0 0</pose>
+            <cast_shadows>false</cast_shadows>
+            <geometry>
+              <plane>
+                <normal>0 0 1</normal>
+                <size>100 100</size>
+              </plane>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grass</name>
+              </script>
+            </material>
+          </visual>
       </link>
       <static>1</static>
     </model>
@@ -101,24 +117,44 @@
 <road name='gen_road1'>
 <width>0.917500</width>
 <point>0.440000 0.000000 0.000000</point>
-<point>5.000000 0.000000 0.000000</point>
+<point>4.560000 0.000000 0.000000</point>
 <material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri><name>OurRoad</name></script><shader type='normal_map_tangent_space'><normal_map>road1.png</normal_map></shader></material></road>
 <road name='gen_road2'>
 <width>0.917500</width>
 <point>0.000000 0.440000 0.000000</point>
-<point>0.000000 5.000000 0.000000</point>
+<point>0.000000 4.560000 0.000000</point>
 <material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri><name>OurRoad</name></script><shader type='normal_map_tangent_space'><normal_map>road1.png</normal_map></shader></material></road>
 <road name='gen_road3'>
 <width>0.917500</width>
-<point>5.000000 -0.440000 0.000000</point>
-<point>5.000000 5.440000 0.000000</point>
+<point>5.000000 0.440000 0.000000</point>
+<point>5.000000 4.560000 0.000000</point>
 <material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri><name>OurRoad</name></script><shader type='normal_map_tangent_space'><normal_map>road1.png</normal_map></shader></material></road>
 <road name='gen_road4'>
 <width>0.917500</width>
-<point>-0.440000 5.000000 0.000000</point>
-<point>5.440000 5.000000 0.000000</point>
+<point>0.440000 5.000000 0.000000</point>
+<point>4.560000 5.000000 0.000000</point>
 <material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri><name>OurRoad</name></script><shader type='normal_map_tangent_space'><normal_map>road1.png</normal_map></shader></material></road>
 <road name='gen_road5'>
+<width>0.917500</width>
+<point>0.000000 -0.458750 0.000000</point>
+<point>0.000000 0.458750 0.000000</point>
+<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/corner.material</uri><name>Corner</name></script><shader type='normal_map_tangent_space'><normal_map>corner.png</normal_map></shader></material></road>
+<road name='gen_road6'>
+<width>0.917500</width>
+<point>-0.458750 4.999956 0.000000</point>
+<point>0.458750 5.000044 0.000000</point>
+<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/corner.material</uri><name>Corner</name></script><shader type='normal_map_tangent_space'><normal_map>corner.png</normal_map></shader></material></road>
+<road name='gen_road7'>
+<width>0.917500</width>
+<point>5.000000 -0.458750 0.000000</point>
+<point>5.000000 0.458750 0.000000</point>
+<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/3wayintersection.material</uri><name>3WayIntersection</name></script><shader type='normal_map_tangent_space'><normal_map>3wayintersection.png</normal_map></shader></material></road>
+<road name='gen_road8'>
+<width>0.917500</width>
+<point>4.999957 5.458750 0.000000</point>
+<point>5.000043 4.541250 0.000000</point>
+<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/3wayintersection.material</uri><name>3WayIntersection</name></script><shader type='normal_map_tangent_space'><normal_map>3wayintersection.png</normal_map></shader></material></road>
+<road name='gen_road9'>
 <width>0.917500</width>
 <point>5.440000 0.000000 0.000000</point>
 <point>5.565000 0.000000 0.000000</point>
@@ -309,10 +345,5 @@
         <kinematic>0</kinematic>
       </link>
 <pose frame=''>6.250000 2.500000 0 0 -0 1.570700</pose>
-    </model><road name='gen_road6'>
-<width>0.917500</width>
-<point>0.000000 -0.458750 0.000000</point>
-<point>0.000000 0.458750 0.000000</point>
-<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/corner.material</uri><name>Corner</name></script><shader type='normal_map_tangent_space'><normal_map>corner.png</normal_map></shader></material></road>
-  </world>
+    </model>  </world>
 </sdf>

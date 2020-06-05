@@ -13,16 +13,21 @@ if __name__ == "__main__":
     contents = wb.get_sources()
 
     wb.add(contents, wb.generate_road_contents([(wb.brs, 0, 0),
-                                                        (40, 0, 0)]))
+                                                (40-wb.brs, 0, 0)]))
 
     wb.add(contents, wb.generate_road_contents([(0, wb.brs, 0),
-                                                        (0, 40, 0)]))
+                                                (0, 40-wb.brs, 0)]))
 
-    wb.add(contents, wb.generate_road_contents([(40, -wb.brs, 0),
-                                                        (40, 40+wb.brs, 0)]))
+    wb.add(contents, wb.generate_road_contents([(40, wb.brs, 0),
+                                                (40, 40-wb.brs, 0)]))
 
-    wb.add(contents, wb.generate_road_contents([(-wb.brs, 40, 0),
-                                                        (40+wb.brs,   40, 0)]))
+    wb.add(contents, wb.generate_road_contents([(wb.brs, 40, 0),
+                                                (40-wb.brs,   40, 0)]))
+
+    wb.add(contents, wb.generate_corner(0, 0, 0))
+    wb.add(contents, wb.generate_corner(0, 40, 1.5707))
+    wb.add(contents, wb.generate_3way(40, 0, 0))
+    wb.add(contents, wb.generate_3way(40, 40, 3.1415))
 
     # Create Curved Road
     angles = np.linspace(0, 3.1415, 10)
@@ -44,7 +49,7 @@ if __name__ == "__main__":
 
     wb.add(contents, wb.generate_house_contents(3, 50, 20, 1.5707))
 
-    wb.add(contents, wb.generate_corner(0, 0, 0))                                 
+                                    
 
     wb.write_dest(contents)
 

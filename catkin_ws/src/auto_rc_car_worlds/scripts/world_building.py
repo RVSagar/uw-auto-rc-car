@@ -42,7 +42,8 @@ class WorldBuilder:
         for pt in points:
             x = pt[0]
             y = pt[1]
-            contents.append("<point>%f %f %f</point>\n" % (x*self.world_scale, y*self.world_scale, 0))
+            z = pt[2]
+            contents.append("<point>%f %f %f</point>\n" % (x*self.world_scale, y*self.world_scale, z))
         contents.append("<material>")
         contents.append("<script>")
         contents.append("<uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri>")
@@ -72,11 +73,11 @@ class WorldBuilder:
         contents.append("<road name='gen_road%d'>\n" % self.cur_road_id)
         contents.append("<width>%f</width>\n" % (L*2))
 
-        x1 = x - L*math.sin(theta)
-        x2 = x + L*math.sin(theta)
+        x1 = x* self.world_scale - L*math.sin(theta)
+        x2 = x* self.world_scale + L*math.sin(theta)
 
-        y1 = y - L*math.cos(theta)
-        y2 = y + L*math.cos(theta)
+        y1 = y* self.world_scale - L*math.cos(theta)
+        y2 = y* self.world_scale + L*math.cos(theta)
 
         contents.append("<point>%f %f %f</point>\n" % (x1, y1, 0))
         contents.append("<point>%f %f %f</point>\n" % (x2, y2, 0))
