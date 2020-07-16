@@ -14,6 +14,13 @@ upper_white = np.array([255,sensitivity,255])
 WHITE_MIN = np.array(lower_white,np.uint8)
 WHITE_MAX = np.array(upper_white,np.uint8)
 
+#51,88,118 -> gazebo road line color HSV
+lower_yellow = np.array([45,40, 40])
+upper_yellow = np.array([55,80,80])
+
+YELLOW_MIN = np.array(lower_yellow,np.uint8)
+YELLOW_MAX = np.array(upper_yellow,np.uint8)
+
 BASE_SPEED = 5
 STEERING_OFFSET = 0
 TIMEOUT = 15
@@ -60,7 +67,7 @@ class HandCodedLaneFollower():
         #    self.car.front_wheels.turn(self.curr_steering_angle)
 	
         curr_heading_image = self.display_heading_line(frame, self.curr_steering_angle)
-        #self.show_image("heading", curr_heading_image)
+        self.show_image("heading", curr_heading_image)
 
         return curr_heading_image, final_steering_angle
         
@@ -74,7 +81,7 @@ class HandCodedLaneFollower():
         #show_image('edges', edges)
 
         cropped_edges = self.region_of_interest(edges)
-        #show_image('edges cropped', cropped_edges)
+        self.show_image('edges cropped', cropped_edges)
 
         line_segments = self.detect_line_segments(cropped_edges)
         line_segment_image = self.display_lines(frame, line_segments)
@@ -92,7 +99,8 @@ class HandCodedLaneFollower():
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #self.show_image("hsv", hsv)
         mask = cv2.inRange(hsv, WHITE_MIN, WHITE_MAX)
-        #self.show_image("black mask", mask)
+        #mask = cv2.inRange(hsv, YELLOW_MIN, YELLOW_MAX)
+        self.show_image("white mask", mask)
 
         # detect edges
         edges = cv2.Canny(mask, 200, 400)
