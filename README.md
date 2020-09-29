@@ -14,7 +14,7 @@ This repository holds some documentation for the electrical and mechanical desig
 1. Go to root folder
 2. `git submodule update --init --recursive`
 3. `make`
-4. `make nvidia` (if you have an NVIDIA GPU)
+~~ 4. `make nvidia` (if you have an NVIDIA GPU)~~
 5. Start the docker `./start_docker.sh`
 6. `cd caktin_ws`
 7. `catkin build` to build all the packages
