@@ -12,6 +12,8 @@ This repository holds some documentation for the electrical and mechanical desig
 
 ## Prerequisites to use:
 
+The easiest way to get up and running with the environment is Docker.
+
 ### Get Docker Running on Your Host
 1. Make sure you have docker client (and daemon) installed on your host OS (see instructions at https://docs.docker.com/get-started/)
 1. Check your docker daemon is running correctly. Running most basic docker client commands will verify this e.g.:
