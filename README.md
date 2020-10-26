@@ -10,7 +10,7 @@ This platform will allow students to delve into:
 
 This repository holds some documentation for the electrical and mechanical design but is mainly a set of ROS packages to interface with the car platform in simulation or real life.
 
-## To use:
+## Prerequisites to use:
 
 ### Get Docker Running on Your Host
 1. Make sure you have docker client (and daemon) installed on your host OS (see instructions at https://docs.docker.com/get-started/)
@@ -37,13 +37,6 @@ This repository holds some documentation for the electrical and mechanical desig
     sudo apt-get update
     sudo apt-get install -y nvidia-container-toolkit
     ```
-1. Navigate to the folder you cloned this repo into.
-1. From within this root directory:
-    ```bash
-    make
-    ```
-    
-Note: Running `make` above should take approximately 20-30 minutes to generate with a decent GPU/CPU.
 
 ## TLDR Quick start guide to test lane following in simulation:
 1. Go to root folder
