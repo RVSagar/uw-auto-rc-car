@@ -3,10 +3,15 @@
 # Originally based on files by Alex Werner for UW Robohub
 # Used with verbal permission
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+# Allows the user to choose what tag to run each time for flexibility
+if [ -z $1 ]; then
+	echo "Usage direction: ./start_docker.sh TAG_NAME"
+	echo "Please input the desired image tag as the first and only argument"
+	echo "Your input was: $1"
+	exit
+fi
 
-
-
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 
 # Variables required for logging as a user with the same id as the user running this script
 export LOCAL_USER_NAME=$USER
@@ -15,10 +20,12 @@ export LOCAL_GROUP_ID=`id -g $USER`
 export LOCAL_GROUP_NAME=`id -gn $USER`
 DOCKER_USER_ARGS="--env LOCAL_USER_NAME --env LOCAL_USER_ID --env LOCAL_GROUP_ID --env LOCAL_GROUP_NAME --privileged"
 
-
-
 # Settings required for having nvidia GPU acceleration inside the docker
-DOCKER_GPU_ARGS="--env DISPLAY=unix${DISPLAY} --env QT_X11_NO_MITSHM=1 --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw"
+# DOCKER_GPU_ARGS="--env DISPLAY=unix${DISPLAY} --env QT_X11_NO_MITSHM=1 --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw"
+# for the headless server there's no DISPLAY to display to so disabling that for now
+# PS even though it's possible to start the x server on the host, the host can't use
+# the GPU for graphics itself yet, plus VNC server in a container is "safer" security wise
+DOCKER_GPU_ARGS="--env QT_X11_NO_MITSHM=1"
 
 which nvidia-docker > /dev/null 2> /dev/null
 HAS_NVIDIA_DOCKER=$?
@@ -54,14 +61,14 @@ xhost +
 ADDITIONAL_FLAGS="--rm --interactive --tty"
 ADDITIONAL_FLAGS="$ADDITIONAL_FLAGS --device /dev/dri:/dev/dri --volume=/run/udev:/run/udev"
 
-
-IMAGE_NAME=uw_rc_car_latest
+IMAGE_NAME=uw_rc_car
+TAG=$1
 CONTAINER_NAME=${IMAGE_NAME}_${USER}
 
-echo Using container: $IMAGE_NAME
+echo Using container: $IMAGE_NAME:$TAG
 
-if ! docker container ps | grep -q ${CONTAINER_NAME}; then
-	echo "Starting new container with name: ${CONTAINER_NAME}"
+if ! docker container ps | grep -q ${CONTAINER_NAME}:${TAG}; then
+	echo "Starting new container with name: ${CONTAINER_NAME}:${TAG}"
 	$DOCKER_COMMAND run \
 	$DOCKER_USER_ARGS \
 	$DOCKER_GPU_ARGS \
@@ -76,9 +83,8 @@ if ! docker container ps | grep -q ${CONTAINER_NAME}; then
 	--net host \
 	--env USER=${USER} \
 	--device /dev/bus/usb \
-	$IMAGE_NAME
+	$IMAGE_NAME:$TAG
 else
 	echo "Starting shell in running container"
 	docker exec -it --workdir /home/${USER} --user root --env USER=${USER} ${CONTAINER_NAME} bash -l -c "stty cols $(tput cols); stty rows $(tput lines); bash"
 fi
-

@@ -6,6 +6,7 @@ catkin_ws/logs
 catkin_ws/.catkin_workspace
 
 *.vscode
+*.bag
 
 .bash_history
 .cache

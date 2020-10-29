@@ -28,4 +28,7 @@
         <node name="client" pkg="auto_rc_car_demos" type="simple_lane_drive.py" output="screen"/>
     </group>
 
+    <node pkg="rosbag" type="record" name="bag_logger"
+        args="record -o /home/avril-ideas/moiz /racecar/out/stereo_camera/rgb/image /racecar/internal/speed_controller/state /racecar/internal/steering_controller/state /racecar/internal/sim_only/global_pos" />
+
 </launch>
