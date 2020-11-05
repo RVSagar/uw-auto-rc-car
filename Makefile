@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 base:
-	docker build --network=host -t uw_rc_car:latest -t uw_rc_car:base -f docker/DockerfileBase .
+	docker build --network=host -t uw_rc_car:latest -t uw_rc_car:base -f docker/Dockerfile.Base .
 
 melodic:
 	docker build -t uw_rc_car:latest -t uw_rc_car:melodic -f docker/Dockerfile.Melodic .

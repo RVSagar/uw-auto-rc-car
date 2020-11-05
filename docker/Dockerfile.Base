@@ -1,0 +1,76 @@
+FROM ros:melodic-robot-bionic
+
+# Install basic useful programs
+# Some are just for testing that the docker image was built correctly
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl \
+      wget \
+      build-essential \
+      cmake \
+      software-properties-common \
+      apt-transport-https \
+      psmisc \
+      vim \
+      gedit \
+      sudo \
+      python-pip \
+      net-tools\
+      dnsutils\
+      iputils-ping\
+      git-all && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Required ROS Packages and Tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      python-catkin-tools \
+      ros-melodic-gazebo-ros-pkgs \
+      ros-melodic-gazebo-ros-control \
+      ros-melodic-joint-state-controller \
+      ros-melodic-teleop-twist-keyboard \
+      ros-melodic-effort-controllers \
+      ros-melodic-position-controllers \
+      ros-melodic-message-to-tf \
+      ros-melodic-rplidar-ros \
+      ros-melodic-serial \ 
+      ros-melodic-ackermann-msgs \
+      ros-melodic-rviz && \
+    rm -rf /var/lib/apt/lists/*
+
+# Update gazebo7 to a later version to not crash
+# RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-latest.list' && \
+#     apt-get update && apt-get install -y wget && \
+#     wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add - && \
+#     apt-get install -y --allow-unauthenticated gazebo7
+
+# Install the frame buffer, DE, and VNC server
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends xvfb xfce4 xfce4-goodies x11vnc dbus-x11
+
+# Install ASTRA camera
+# https://astra-wiki.readthedocs.io/en/latest/installation.html
+# https://www.dropbox.com/sh/ou49febb83m476d/AADqCQuI3agPOdhyuihl0NHMa?dl=0
+# RUN mkdir -p /workspace
+# ADD ./Astra_Installation/2-Linux /workspace/2-Linux
+# RUN cd /workspace/2-Linux && \
+#     unzip OpenNI-Linux-x64-2.3.zip -d /workspace/OpenNi && \
+#     cd /workspace/OpenNi/OpenNI-Linux-x64-2.3 && \
+#     chmod a+x install.sh && \
+#     ./install.sh && \
+#     chmod a+rwx -R /workspace/OpenNi
+# RUN apt-get update && \
+#     apt-get install -y \
+#       ros-melodic-libuvc* \
+#       ros-melodic-astra-camera \
+#       ros-melodic-astra-launch && \
+#     rm -rf /var/lib/apt/lists/*
+
+# setup entrypoint
+COPY ./docker/entrypoint.sh /
+RUN chmod +x /entrypoint.sh
+ADD ./.bashrc /root/.bashrc
+
+# start FB, DE, and VNC
+CMD ["/entrypoint.sh"]

@@ -5,7 +5,7 @@
 
 # Allows the user to choose what tag to run each time for flexibility
 if [ -z $1 ]; then
-	echo "Usage direction: ./start_docker.sh TAG_NAME"
+	echo "Usage direction: ./start_docker.sh TAG_NAME [COMMAND_OVERRIDE]"
 	echo "Please input the desired image tag as the first and only argument"
 	echo "Your input was: $1"
 	exit
@@ -83,7 +83,8 @@ if ! docker container ps | grep -q ${CONTAINER_NAME}:${TAG}; then
 	--net host \
 	--env USER=${USER} \
 	--device /dev/bus/usb \
-	$IMAGE_NAME:$TAG
+	$IMAGE_NAME:$TAG \
+	$2
 else
 	echo "Starting shell in running container"
 	docker exec -it --workdir /home/${USER} --user root --env USER=${USER} ${CONTAINER_NAME} bash -l -c "stty cols $(tput cols); stty rows $(tput lines); bash"
