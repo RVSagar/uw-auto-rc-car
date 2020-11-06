@@ -10,11 +10,41 @@ This platform will allow students to delve into:
 
 This repository holds some documentation for the electrical and mechanical design but is mainly a set of ROS packages to interface with the car platform in simulation or real life.
 
+## Prerequisites to use:
+
+The easiest way to get up and running with the environment is Docker.
+
+### Get Docker Running on Your Host
+1. Make sure you have docker client (and daemon) installed on your host OS (see instructions at https://docs.docker.com/get-started/)
+1. Check your docker daemon is running correctly. Running most basic docker client commands will verify this e.g.:
+    ```bash
+    docker image ls
+    ```
+1. If the above fails (typically on Ubuntu), you may need to restart your docker daemon:
+    ```bash
+    sudo service docker stop
+    sudo service docker start
+    ```
+
+### Create docker image from the Dockerfile
+1. Make sure you have nvidia drivers and the nvidia-cuda-toolkit installed or your container will try to use the inbuilt CPU graphics instead, and won't run properly. To install the toolkit:
+    ```bash
+    sudo apt-get install nvidia-cuda-toolkit
+    ```
+1. Install nvidia-docker by following the instructions at https://github.com/NVIDIA/nvidia-docker. This essentially boils down to:
+    ```bash
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+    curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+    sudo apt-get update
+    sudo apt-get install -y nvidia-container-toolkit
+    ```
+
 ## TLDR Quick start guide to test lane following in simulation:
 1. Go to root folder
 2. `git submodule update --init --recursive`
 3. `make`
-4. `make nvidia` (if you have an NVIDIA GPU)
+4. ~~`make nvidia` (if you have an NVIDIA GPU)~~
 5. Start the docker `./start_docker.sh`
 6. `cd caktin_ws`
 7. `catkin build` to build all the packages
