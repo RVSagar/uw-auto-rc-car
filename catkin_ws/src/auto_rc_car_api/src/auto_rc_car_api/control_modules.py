@@ -86,8 +86,8 @@ class BaseControlModule:
         speed = self.speed_to_signal(msg.speed)
         steer = self.steer_to_signal(msg.steer)
 
-        self.steer_pub.publish(Float64(steer))
-        self.speed_pub.publish(Float64(speed))
+        self.publish_speed(speed)
+        self.publish_steer(steer)
 
 
     def brake(self):
@@ -101,7 +101,13 @@ class BaseControlModule:
     def steer_to_signal(self, steer):
         raise NotImplementedError
 
+    def publish_steer(self, steer):
+        raise NotImplementedError
+
     def speed_to_signal(self, speed):
+        raise NotImplementedError
+
+    def publish_speed(self, speed):
         raise NotImplementedError
 
 
@@ -109,7 +115,10 @@ class BaseControlModule:
 class SimulationControlModule(BaseControlModule):
     def __init__(self, joy_module):
         self.steer_pub = rospy.Publisher('/racecar/internal/steering_controller/command', Float64, queue_size=3)
-        self.speed_pub = rospy.Publisher('/racecar/internal/speed_controller/command', Float64, queue_size=3)
+        self.left_front_wheel_pub = rospy.Publisher('/racecar/internal/left_front_controller/command', Float64, queue_size=1)
+        self.right_front_wheel_pub = rospy.Publisher('/racecar/internal/right_front_controller/command', Float64, queue_size=1)
+        self.left_rear_wheel_pub = rospy.Publisher('/racecar/internal/left_rear_controller/command', Float64, queue_size=1)
+        self.right_rear_wheel_pub = rospy.Publisher('/racecar/internal/right_rear_controller/command', Float64, queue_size=1)
         self.speed_K = 1.0
         self.anti_deadband = 0
         self.max_speed = 99
@@ -122,6 +131,16 @@ class SimulationControlModule(BaseControlModule):
     
     def steer_to_signal(self, steer):
         return steer
+
+    def publish_speed(self, speed):
+        self.left_front_wheel_pub.publish(Float64(speed))
+        self.right_front_wheel_pub.publish(Float64(speed))
+        self.left_rear_wheel_pub.publish(Float64(speed))
+        self.right_rear_wheel_pub.publish(Float64(speed))
+
+    def publish_steer(self, steer):
+        self.steer_pub.publish(Float64(steer))
+
 
 
 class RealControlModule(BaseControlModule):
@@ -165,4 +184,10 @@ class RealControlModule(BaseControlModule):
         if current > self.max_current:
             current = self.max_current
         
-        return current 
+        return current
+
+    def publish_speed(self, speed):
+        self.speed_pub.publish(Float64(speed))
+
+    def publish_steer(self, steer):
+        self.speed_pub.publish(Float64(steer))
