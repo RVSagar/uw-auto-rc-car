@@ -38,12 +38,6 @@ RUN apt-get update && \
       ros-melodic-rviz && \
     rm -rf /var/lib/apt/lists/*
 
-# Update gazebo7 to a later version to not crash
-# RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-latest.list' && \
-#     apt-get update && apt-get install -y wget && \
-#     wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add - && \
-#     apt-get install -y --allow-unauthenticated gazebo7
-
 # Install the frame buffer, DE, and VNC server
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
@@ -69,8 +63,15 @@ RUN apt-get update && \
 
 # setup entrypoint
 COPY ./docker/entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-ADD ./.bashrc /root/.bashrc
+COPY ./.bashrc /root/
+COPY ./docker/xfce-perchannel-xml /root/.config/xfce4/xfconf/xfce-perchannel-xml
+RUN chmod +x /entrypoint.sh && \
+    # useradd -ms /bin/bash -G sudo container-user && \
+    # cat /root/.bashrc >> /home/container-user/.bashrc && \
+    # mkdir -p /home/container-user/.config/xfce4/xfconf/ && \
+    # cp -r /root/.config/xfce4/xfconf/xfce-perchannel-xml/ \
+    #    /home/container-user/.config/xfce4/xfconf/ && \
+    apt-get update && apt-get install -y bash-completion
 
 # start FB, DE, and VNC
 CMD ["/entrypoint.sh"]

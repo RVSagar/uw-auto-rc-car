@@ -22,6 +22,8 @@ This repository holds some documentation for the electrical and mechanical desig
 9. `roslaunch auto_rc_car_demos simple_lane_demo_sim.launch` to launch Gazebo and rviz
 10. Open a new terminal and type `rosrun auto_rc_car_demos simple_lane_drive.py`
 
+`simple_lane_demo_sim.launch` has a few optional command line arguments such as `record:=true` to enable logging via a rosbag, `bag_prefix:=MY_PREFIX` to specify a file name prefix for that rosbag, and `topics:="TOPIC1 TOPIC2"` to choose what topics to record (record all if left unspecified). If multiple arguments are supplemented, separate them with whitespace.
+
 ## Component Overview
 - `auto_rc_car_api`: core package that contains custom messages, services and nodes to interface with a simulated or real car
 - `auto_rc_car_control`: controllers for simulating the car in Gazebo
