@@ -33,7 +33,7 @@
 
     <group if="$(arg record)">
         <node pkg="rosbag" type="record" name="bag_logger"
-            args="record -o /home/avril-ideas/$(arg bag_prefix) $(arg topics)"/>
+            args="record -o /home/$(env USER)/$(arg bag_prefix) $(arg topics)"/>
     </group>
 
 </launch>

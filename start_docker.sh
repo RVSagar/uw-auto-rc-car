@@ -6,7 +6,7 @@
 # Allows the user to choose what tag to run each time for flexibility
 if [ -z $1 ]; then
 	echo "Usage direction: ./start_docker.sh TAG_NAME [COMMAND_OVERRIDE]"
-	echo "Please input the desired image tag as the first and only argument"
+	echo "Please input the desired image tag as the first argument"
 	echo "Your input was: $1"
 	exit
 fi
