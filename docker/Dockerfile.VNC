@@ -38,6 +38,11 @@ RUN apt-get update && \
       ros-melodic-rviz && \
     rm -rf /var/lib/apt/lists/*
 
+# Install the frame buffer, DE, and VNC server
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends xvfb xfce4 xfce4-goodies x11vnc dbus-x11
+
 # Install ASTRA camera
 # https://astra-wiki.readthedocs.io/en/latest/installation.html
 # https://www.dropbox.com/sh/ou49febb83m476d/AADqCQuI3agPOdhyuihl0NHMa?dl=0
@@ -59,6 +64,16 @@ RUN apt-get update && \
 # setup entrypoint
 COPY ./docker/entrypoint.sh /
 COPY ./.bashrc /root/
-RUN apt-get update && apt-get install -y bash-completion && rm -rf /var/lib/apt/lists/*
+COPY ./docker/xfce-perchannel-xml /root/.config/xfce4/xfconf/xfce-perchannel-xml
+RUN chmod +x /entrypoint.sh && \
+    # useradd -ms /bin/bash -G sudo container-user && \
+    # cat /root/.bashrc >> /home/container-user/.bashrc && \
+    # mkdir -p /home/container-user/.config/xfce4/xfconf/ && \
+    # cp -r /root/.config/xfce4/xfconf/xfce-perchannel-xml/ \
+    #    /home/container-user/.config/xfce4/xfconf/ && \
+    apt-get update && apt-get install -y bash-completion
 
-CMD ["bash"]
+# start FB, DE, and VNC
+# making the "entrypoint" as a cmd so that GNU commands can override it
+# at runtime without going through the entrypoint script
+CMD ["/entrypoint.sh"]

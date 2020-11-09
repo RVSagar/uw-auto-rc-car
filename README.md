@@ -43,9 +43,9 @@ The easiest way to get up and running with the environment is Docker.
 ## TLDR Quick start guide to test lane following in simulation:
 1. Go to root folder
 2. `git submodule update --init --recursive`
-3. `make`
+3. `make` (`make vnc` if running on remote server)
 4. ~~`make nvidia` (if you have an NVIDIA GPU)~~
-5. Start the docker `./start_docker.sh`
+5. Start the docker `./start_docker.sh latest`
 6. `cd caktin_ws`
 7. `catkin build` to build all the packages
 8. `source devel/setup.bash`

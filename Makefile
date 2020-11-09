@@ -6,10 +6,9 @@ base:
 tf:
 	docker build -t uw_rc_car:latest -t uw_rc_car:tf -f docker/Dockerfile.Tensorflow .
 
-# Obsolete
-base_vnc: 
-	docker build --network=host -t uw_rc_car:latest -t uw_rc_car:vnc -f docker/DockerfileBaseVNC .
+vnc: 
+	docker build --network=host -t uw_rc_car:latest -t uw_rc_car:vnc -f docker/Dockerfile.VNC .
 
 # Obsolete
 nvidia:
-	docker build -t uw_rc_car:latest -t uw_rc_car:nvidia -f docker/DockerfileNvidia --build-arg BASE_IMAGE=uw_rc_car_base .
+	docker build -t uw_rc_car:latest -t uw_rc_car:nvidia -f docker/DockerfileNvidia --build-arg BASE_IMAGE=uw_rc_car:base .
