@@ -74,4 +74,6 @@ RUN chmod +x /entrypoint.sh && \
     apt-get update && apt-get install -y bash-completion
 
 # start FB, DE, and VNC
+# making the "entrypoint" as a cmd so that GNU commands can override it
+# at runtime without going through the entrypoint script
 CMD ["/entrypoint.sh"]
