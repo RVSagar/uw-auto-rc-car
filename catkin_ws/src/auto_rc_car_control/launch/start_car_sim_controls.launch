@@ -8,5 +8,8 @@
           output="screen"
           args="joint_state_controller
                 steering_controller
-                speed_controller"/>
+                right_front_controller
+                left_front_controller
+                right_rear_controller
+                left_rear_controller"/>
 </launch>
