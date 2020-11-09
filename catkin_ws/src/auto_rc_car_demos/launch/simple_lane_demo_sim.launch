@@ -5,6 +5,9 @@
     <arg name="run_as_remote" default="false"/>
     <arg name="run_client" default="true"/>
     <arg name="timeout" default="-1"/>
+    <arg name="record" default="false"/>
+    <arg name="bag_prefix" default="lane_demo_sim"/>
+    <arg name="topics" default="-a" />
 
     <param name="client_comm_type" value="local"/>
     <param name="client_context_type" value="sim"/>
@@ -26,6 +29,11 @@
     
     <group if="$(arg run_client)">
         <node name="client" pkg="auto_rc_car_demos" type="simple_lane_drive.py" output="screen"/>
+    </group>
+
+    <group if="$(arg record)">
+        <node pkg="rosbag" type="record" name="bag_logger"
+            args="record -o /home/$(env USER)/$(arg bag_prefix) $(arg topics)"/>
     </group>
 
 </launch>

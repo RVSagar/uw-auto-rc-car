@@ -1,0 +1,64 @@
+FROM ros:melodic-robot-bionic
+
+# Install basic useful programs
+# Some are just for testing that the docker image was built correctly
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl \
+      wget \
+      build-essential \
+      cmake \
+      software-properties-common \
+      apt-transport-https \
+      psmisc \
+      vim \
+      gedit \
+      sudo \
+      python-pip \
+      net-tools\
+      dnsutils\
+      iputils-ping\
+      git-all && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Required ROS Packages and Tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      python-catkin-tools \
+      ros-melodic-gazebo-ros-pkgs \
+      ros-melodic-gazebo-ros-control \
+      ros-melodic-joint-state-controller \
+      ros-melodic-teleop-twist-keyboard \
+      ros-melodic-effort-controllers \
+      ros-melodic-position-controllers \
+      ros-melodic-message-to-tf \
+      ros-melodic-rplidar-ros \
+      ros-melodic-serial \ 
+      ros-melodic-ackermann-msgs \
+      ros-melodic-rviz && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install ASTRA camera
+# https://astra-wiki.readthedocs.io/en/latest/installation.html
+# https://www.dropbox.com/sh/ou49febb83m476d/AADqCQuI3agPOdhyuihl0NHMa?dl=0
+# RUN mkdir -p /workspace
+# ADD ./Astra_Installation/2-Linux /workspace/2-Linux
+# RUN cd /workspace/2-Linux && \
+#     unzip OpenNI-Linux-x64-2.3.zip -d /workspace/OpenNi && \
+#     cd /workspace/OpenNi/OpenNI-Linux-x64-2.3 && \
+#     chmod a+x install.sh && \
+#     ./install.sh && \
+#     chmod a+rwx -R /workspace/OpenNi
+# RUN apt-get update && \
+#     apt-get install -y \
+#       ros-melodic-libuvc* \
+#       ros-melodic-astra-camera \
+#       ros-melodic-astra-launch && \
+#     rm -rf /var/lib/apt/lists/*
+
+# setup entrypoint
+COPY ./docker/entrypoint.sh /
+COPY ./.bashrc /root/
+RUN apt-get update && apt-get install -y bash-completion && rm -rf /var/lib/apt/lists/*
+
+CMD ["bash"]

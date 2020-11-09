@@ -17,3 +17,5 @@ catkin_ws/.catkin_workspace
 .rviz
 .sdformat
 .viminfo
+
+*.bag
