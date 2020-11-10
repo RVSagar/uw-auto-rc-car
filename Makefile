@@ -1,13 +1,13 @@
 SHELL := /bin/bash
 
 base:
-	docker build --network=host -t uw_rc_car:latest -t uw_rc_car:base -f docker/Dockerfile.Base .
+	docker build -t uw_rc_car:latest -t uw_rc_car:base -f docker/Dockerfile.Base .
 
 tf:
 	docker build -t uw_rc_car:latest -t uw_rc_car:tf -f docker/Dockerfile.Tensorflow .
 
-vnc: 
-	docker build --network=host -t uw_rc_car:latest -t uw_rc_car:vnc -f docker/Dockerfile.VNC .
+vnc: base
+	docker build -t uw_rc_car:latest -t uw_rc_car:vnc -f docker/Dockerfile.VNC .
 
 # Obsolete
 nvidia:
