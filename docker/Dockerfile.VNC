@@ -3,7 +3,7 @@ FROM uw_rc_car:base
 # Install the frame buffer, DE, and VNC server
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends xvfb xfce4 xfce4-goodies x11vnc dbus-x11
+    apt-get install -y --no-install-recommends xvfb xfce4 xfce4-goodies x11vnc dbus-x11 python-tk
 
 # Install ASTRA camera
 # https://astra-wiki.readthedocs.io/en/latest/installation.html
@@ -25,7 +25,10 @@ RUN apt-get update && \
 
 COPY ./docker/entrypoint.sh /
 COPY ./docker/xfce-perchannel-xml /root/.config/xfce4/xfconf/xfce-perchannel-xml
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh && \
+    python -m pip install pip -U && \
+    python -m pip install matplotlib
+
 # RUN useradd -ms /bin/bash -G sudo container-user && \
     # cat /root/.bashrc >> /home/container-user/.bashrc && \
     # mkdir -p /home/container-user/.config/xfce4/xfconf/ && \

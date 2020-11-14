@@ -5,6 +5,10 @@ catkin_ws/devel
 catkin_ws/logs
 catkin_ws/.catkin_workspace
 
+catkin_ws/src/ros_demo
+build_ros_model.sh
+ros_demo.tgz
+
 *.vscode
 *.bag
 

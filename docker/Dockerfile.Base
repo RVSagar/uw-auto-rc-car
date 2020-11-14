@@ -58,7 +58,8 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ros-melodic-rgbd-launch ros-melodic-libuvc ros-melodic-libuvc-camera \
-    ros-melodic-libuvc-ros bash-completion && rm -rf /var/lib/apt/lists/*
+    ros-melodic-libuvc-ros bash-completion ros-melodic-rosserial \
+    ros-melodic-rosserial-arduino && rm -rf /var/lib/apt/lists/*
 
 # setup bash ROS runtime
 COPY ./docker/.bashrc /root/
