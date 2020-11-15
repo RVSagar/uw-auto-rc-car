@@ -43,9 +43,9 @@ class HandCodedLaneFollower():
         #self.show_image("orig", frame)
 
         lane_lines, frame = self.detect_lane(frame)
-        final_frame, final_steering_angle = self.steer(frame, lane_lines)
+        final_frame, final_steering_angle, ang_deg = self.steer(frame, lane_lines)
 
-        return final_frame, final_steering_angle
+        return final_frame, final_steering_angle, ang_deg
 
     def convert_to_api_steer(self, steering_angle):
         final_steering_angle = -((steering_angle - 90.0)/90.0)
@@ -60,7 +60,7 @@ class HandCodedLaneFollower():
 
         new_steering_angle = self.compute_steering_angle(frame, lane_lines)
         self.curr_steering_angle = self.stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))
-        print("Steering Angle in degrees: ", self.curr_steering_angle)
+        # print("Steering Angle in degrees: ", self.curr_steering_angle)
         final_steering_angle = self.convert_to_api_steer(self.curr_steering_angle)
 
         #if self.car is not None:
@@ -69,7 +69,7 @@ class HandCodedLaneFollower():
         curr_heading_image = self.display_heading_line(frame, self.curr_steering_angle)
         self.show_image("heading", curr_heading_image)
 
-        return curr_heading_image, final_steering_angle
+        return curr_heading_image, final_steering_angle, self.curr_steering_angle
         
     ############################
     # Frame processing steps

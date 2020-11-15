@@ -9,6 +9,7 @@ from auto_rc_car_api.client_factory import ClientGenerator
 from auto_rc_car_demos.basic_camera import BasicCameraCalc, HandCodedLaneFollower
 from auto_rc_car_demos.lidar_calc import LidarCalc
 
+from auto_rc_car_msgs.msg import SimpleLaneFollowStatus
 
 
 
@@ -19,6 +20,9 @@ if __name__ == "__main__":
     basic_cam_calc = BasicCameraCalc()
     lidar_calc = LidarCalc()
     lane_follower = HandCodedLaneFollower()
+
+    status_msg = SimpleLaneFollowStatus()
+    status_pub = rospy.Publisher("/status", SimpleLaneFollowStatus, queue_size=3)
 
     print("Starting")
     dist = 0
@@ -31,6 +35,7 @@ if __name__ == "__main__":
     timeout = rospy.get_param("timeout", -1)
 
     while not rospy.is_shutdown():
+        status_msg.time_up.data = rospy.Time.now() - t_start
         
         # Exit conditions
         if timeout > 0 and (rospy.Time.now() - t_start).to_sec() > timeout or rospy.is_shutdown():
@@ -46,6 +51,7 @@ if __name__ == "__main__":
 
         # Slow down if it has been 'a while' since last loop
         dt_speed_scale = 1.0 / (1 + 2* dt) #50
+        status_msg.dt_speed_scale = dt_speed_scale
         
 
         if img is None:
@@ -70,10 +76,14 @@ if __name__ == "__main__":
 
         # OR
 
-        final_frame , control_ang = lane_follower.follow_lane(img)
+        final_frame , control_ang, ang_deg = lane_follower.follow_lane(img)
 
         # Slow down if turning
         steer_speed_scale = 1.0 / (steer_speed_scale * control_ang*control_ang + 1.0)
+
+        status_msg.control_ang = control_ang
+        status_msg.steer_ang_deg = ang_deg
+        status_msg.steer_speed_scale = steer_speed_scale
 
         # Detect street lights
         c, c_mag = basic_cam_calc.detect_sign(img_red)
@@ -81,6 +91,9 @@ if __name__ == "__main__":
             light_speed_scale = 0.0
         else:
             light_speed_scale = 1.0
+
+        status_msg.sign = c
+        status_msg.light_speed_scale = light_speed_scale
 
         data = "Dist = %f     Data Transfer Time = %f" % (dist, dt)
         cv2.putText(img, data, (0,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0))
@@ -91,7 +104,6 @@ if __name__ == "__main__":
         lidar_left_speed_scale = 1.0
         lidar_right_speed_scale = 1.0
 
-        dist_front = -2
         dist_front_left = -2
         dist_front_right = -2
         dist_left = -2
@@ -122,25 +134,25 @@ if __name__ == "__main__":
 
         except ZeroDivisionError as e:
             print(e)
+
+        
+        status_msg.dist_front_left = dist_front_left
+        status_msg.dist_front_right = dist_front_right
+        status_msg.dist_left = dist_left
+        status_msg.dist_right = dist_right
+
+        status_msg.lidar_front_speed_scale = lidar_front_speed_scale
+        status_msg.lidar_left_speed_scale = lidar_left_speed_scale
+        status_msg.lidar_right_speed_scale = lidar_right_speed_scale
         
         # Combine Speed Scales
         lidar_speed_scale = lidar_front_speed_scale * lidar_left_speed_scale * lidar_right_speed_scale
         speed = base_speed * steer_speed_scale * dt_speed_scale * light_speed_scale * lidar_speed_scale
 
+        status_msg.lidar_speed_scale = lidar_speed_scale
+        status_msg.speed = speed
         
-        # print("")
-        # print("dt=%f" % dt)
-        print("speed=%f" % speed)
-        print("steer_ang=%f" % control_ang)
-        # print("x_centroid=%f" % centroid_x)
-        # print("black centroid=%f" % centroid_percentage)
-        # print("c=%s" % c)
-        # print("c_mag=%f" % c_mag)
-        # print("dist_front_left=%f" % dist_front_left)
-        # print("dist_front_right=%f" % dist_front_right)
-        # print("dist_left=%f" % dist_left)
-        # print("dist_right=%f" % dist_right)
-        
+        status_pub.publish(status_msg)        
         
         # Send control
         if abs(speed) < 0.1:
