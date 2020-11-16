@@ -55,10 +55,13 @@ RUN apt-get update && \
 #       ros-melodic-astra-camera \
 #       ros-melodic-astra-launch && \
 #     rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ros-melodic-rgbd-launch ros-melodic-libuvc ros-melodic-libuvc-camera \
+    ros-melodic-libuvc-ros bash-completion ros-melodic-rosserial \
+    ros-melodic-rosserial-arduino && rm -rf /var/lib/apt/lists/*
 
-# setup entrypoint
-COPY ./docker/entrypoint.sh /
-COPY ./.bashrc /root/
-RUN apt-get update && apt-get install -y bash-completion && rm -rf /var/lib/apt/lists/*
+# setup bash ROS runtime
+COPY ./docker/.bashrc /root/
 
 CMD ["bash"]
