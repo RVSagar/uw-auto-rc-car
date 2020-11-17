@@ -89,7 +89,7 @@ if ! docker container ps | grep -q ${CONTAINER_NAME}:${TAG}; then
 	--env USER=${USER} \
 	--device /dev/bus/usb \
 	$IMAGE_NAME:$TAG \
-	$2
+	$3
 else
 	echo "Starting shell in running container"
 	docker exec -it --workdir /home/${USER} --user root --env USER=${USER} ${CONTAINER_NAME} bash -l -c "stty cols $(tput cols); stty rows $(tput lines); bash"
