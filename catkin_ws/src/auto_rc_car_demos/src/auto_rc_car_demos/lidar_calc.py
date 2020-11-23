@@ -25,7 +25,7 @@ class LidarCalc:
         meas = [m for m in meas if np.isfinite(m)]
 
         if len(meas) == 0:
-            return 0
+            return 0.0
 
         num_too_close = 0.0
         for m in meas:
