@@ -5,9 +5,11 @@
 
 # Allows the user to choose what tag to run each time for flexibility
 if [ -z $1 ]; then
-	echo "Usage direction: ./start_docker.sh TAG_NAME [COMMAND_OVERRIDE]"
+	echo "Usage direction: ./start_docker.sh TAG_NAME LOCAL_DISPLAY [COMMAND_OVERRIDE]"
 	echo "Please input the desired image tag as the first argument"
-	echo "Your input was: $1"
+	# TODO: finish this
+	echo "And a \"yes\" for using a local display or \"no\" otherwise"
+	echo "Your input was: $1 $2 $3"
 	exit
 fi
 
@@ -21,11 +23,14 @@ export LOCAL_GROUP_NAME=`id -gn $USER`
 DOCKER_USER_ARGS="--env LOCAL_USER_NAME --env LOCAL_USER_ID --env LOCAL_GROUP_ID --env LOCAL_GROUP_NAME --privileged"
 
 # Settings required for having nvidia GPU acceleration inside the docker
-# DOCKER_GPU_ARGS="--env DISPLAY=unix${DISPLAY} --env QT_X11_NO_MITSHM=1 --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw"
+if [ $2 == "yes" ]; then
+	DOCKER_GPU_ARGS="--env DISPLAY=unix${DISPLAY} --env QT_X11_NO_MITSHM=1 --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw"
+else
+	DOCKER_GPU_ARGS="--env QT_X11_NO_MITSHM=1"
+fi
 # for the headless server there's no DISPLAY to display to so disabling that for now
 # PS even though it's possible to start the x server on the host, the host can't use
 # the GPU for graphics itself yet, plus VNC server in a container is "safer" security wise
-DOCKER_GPU_ARGS="--env QT_X11_NO_MITSHM=1"
 
 which nvidia-docker > /dev/null 2> /dev/null
 HAS_NVIDIA_DOCKER=$?
@@ -84,7 +89,7 @@ if ! docker container ps | grep -q ${CONTAINER_NAME}:${TAG}; then
 	--env USER=${USER} \
 	--device /dev/bus/usb \
 	$IMAGE_NAME:$TAG \
-	$2
+	$3
 else
 	echo "Starting shell in running container"
 	docker exec -it --workdir /home/${USER} --user root --env USER=${USER} ${CONTAINER_NAME} bash -l -c "stty cols $(tput cols); stty rows $(tput lines); bash"
