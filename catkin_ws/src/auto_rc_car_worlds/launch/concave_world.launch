@@ -79,5 +79,5 @@
 
 
 
-  <node name="concave_controller" pkg="auto_rc_car_worlds" type="concave_world_control.py"/>
+  <!--<node name="concave_controller" pkg="auto_rc_car_worlds" type="concave_world_control.py" output="screen"/>-->
 </launch>
