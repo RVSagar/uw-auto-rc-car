@@ -3,9 +3,9 @@
     <arg name="x" default="0.0"/>
     <arg name="y" default="0.0"/>
     <arg name="yaw" default="0.0"/>
-    <arg name="SENSOR_NOISE" default="0.0"/>
+    <arg name="CONFIG_FILE" default="base_car_params.yaml"/>
 
-    <param name="$(arg robot_parameter)" command="$(find xacro)/xacro --inorder $(find auto_rc_car_description)/urdf/car_base.urdf.xacro 'SENSOR_NOISE:=$(arg SENSOR_NOISE)'"/>
+    <param name="$(arg robot_parameter)" command="$(find xacro)/xacro --inorder $(find auto_rc_car_description)/urdf/car_base.urdf.xacro 'CONFIG_FILE:=$(arg CONFIG_FILE)'"/>
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param $(arg robot_parameter) -x $(arg x) -y $(arg y) -z 0.5 -Y $(arg yaw) -urdf -model racecar" respawn="false" output="screen"/>
 
     <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />-->
