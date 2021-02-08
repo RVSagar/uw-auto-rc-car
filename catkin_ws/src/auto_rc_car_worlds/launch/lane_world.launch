@@ -1,4 +1,6 @@
 <launch>
+  <arg name="CAR_CONFIG" default="base_car_params.yaml"/>
+
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find auto_rc_car_worlds)/worlds/lane_world.sdf"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
@@ -13,6 +15,7 @@
     <arg name="x" value="0.0"/>
     <arg name="y" value="-0.25"/>
     <arg name="yaw" value="0.0"/>
+    <arg name="CONFIG_FILE" value="$(arg CAR_CONFIG)"/>
   </include>
   <include file="$(find auto_rc_car_control)/launch/start_car_sim_controls.launch"/>
 

@@ -4,31 +4,39 @@
 mit-racecar/racecar_gazebo
 -->
 
-<xacro:arg name="SENSOR_NOISE" default="0.0"/>
+<xacro:arg name="CONFIG_FILE" default="base_car_params.yaml"/>
 
-<xacro:include filename="$(find auto_rc_car_description/urdf/car_sensors.urdf.xacro"/>
-<xacro:macro name="car_sensors" NOISE_MAG="${SENSOR_NOISE}"/>
+<xacro:property name="filename" value="$(find auto_rc_car_description)/config/$(arg CONFIG_FILE)"/>
+<xacro:property name="params" value="${load_yaml(filename)}"/>
+
+<xacro:include filename="$(find auto_rc_car_description)/urdf/car_sensors.urdf.xacro"/>
+<xacro:car_sensors PARAMS="${params}"/>
 
 <!-- Set Origin: Center of body lengthwise, height of ~middle of the gearbox -->
 
-<xacro:property name="wheel_y_offset" value="0.115" />
-<xacro:property name="wheel_z_offset" value="-0.03" />
-<xacro:property name="rear_wheel_x_offset" value="-0.14" />
-<xacro:property name="front_wheel_x_offset" value="0.14" />
+<xacro:property name="wheel_y_offset"       value="${params.get('wheel_y_offset', 0.115)}" />
+<xacro:property name="wheel_z_offset"       value="${params.get('wheel_z_offset', 0.115)}" />
+<xacro:property name="front_wheel_x_offset" value="${params.get('front_wheel_x_offset', 0.14)}" />
+<xacro:property name="rear_wheel_x_offset"  value="${params.get('rear_wheel_x_offset', -0.14)}" />
 
 <xacro:property name="pi_2" value="1.5708" />
 <xacro:property name="pi_4" value="0.7854" />
 
 <xacro:property name="chassis_geometry">
-  <box size="0.4 0.13 0.05" />
+  <box size="${params.get('chassis_length', 0.4)} ${params.get('chassis_width', 0.13)} ${params.get('chassis_height', 0.05)}" />
 </xacro:property>
 
 
 <xacro:property name="chassis_inertia">
    <inertial>
      <origin xyz="0 0 0" rpy="0 0 0"/>
-     <mass value="100"/>
-     <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="10" />
+     <mass value="${params.get('chassis_mass', 100)}"/>
+     <inertia ixx="${params.get('chassis_Ixx', 100)}"
+              ixy="${params.get('chassis_Ixy', 0)}"
+              ixz="${params.get('chassis_Ixz', 0)}"
+              iyy="${params.get('chassis_Iyy', 100)}"
+              iyz="${params.get('chassis_Iyz', 0)}"
+              izz="${params.get('chassis_Izz', 10)}" />
    </inertial>
 </xacro:property>
 
@@ -39,7 +47,8 @@ mit-racecar/racecar_gazebo
     <parent link="${parent}"/>
     <child link="${name}_link"/>
     <axis xyz="0 0 ${polarity}" />
-    <limit effort="10" velocity="100" />
+    <limit effort="${params.get('wheel_effort_limit', 10)}"
+           velocity="${params.get('wheel_velocity_limit', 10)}" />
   </joint>
 
   <transmission name="${name}_transmission" type="SimpleTransmission">
@@ -58,7 +67,7 @@ mit-racecar/racecar_gazebo
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <cylinder length="0.05" radius="0.055" />
+        <cylinder length="0.05" radius="${params.get('wheel_radius', 0.1)}" />
       </geometry>
       <material name="Black">
         <color rgba="0 0 0 1"/>
@@ -66,22 +75,27 @@ mit-racecar/racecar_gazebo
     </visual>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="1"/>
-      <inertia ixx="10"  ixy="0"  ixz="0" iyy="10" iyz="0" izz="1" />
+      <mass value="${params.get('wheel_mass', 1)}"/>
+      <inertia ixx="${params.get('wheel_Ixx', 10)}"
+               ixy="${params.get('wheel_Ixy', 0)}"
+               ixz="${params.get('wheel_Ixz', 0)}"
+               iyy="${params.get('wheel_Iyy', 1)}"
+               iyz="${params.get('wheel_Iyz', 0)}"
+               izz="${params.get('wheel_Izz', 1)}" />
     </inertial>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.05" radius="0.1" />
+        <cylinder length="0.05" radius="${params.get('wheel_radius', 0.1)}" />
       </geometry>
     </collision>
   </link>
 
     <gazebo reference="${name}_link">
-      <mu1 value="10.0"/>
-      <mu2 value="10.0"/>
-      <kp  value="10000000.0" />
-      <kd  value="5.0" />
+      <mu1 value="${params.get('wheel_gaz_mu1', 10.0)}"/>
+      <mu2 value="${params.get('wheel_gaz_mu2', 10.0)}"/>
+      <kp  value="${params.get('wheel_gaz_kp', 10000000.0)}" />
+      <kd  value="${params.get('wheel_gaz_kd', 5.0)}" />
       <material>Gazebo/Black</material>
   </gazebo>
 </xacro:macro>

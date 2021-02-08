@@ -1,0 +1,35 @@
+lidar_noise: 0.0
+
+chassis_length: 0.8
+chassis_width: 0.26
+chassis_height: 0.1
+
+wheel_y_offset: 0.23
+wheel_z_offset: -0.06
+front_wheel_x_offset: -0.28
+rear_wheel_x_offset: 0.28
+
+chassis_mass: 100
+chassis_Ixx: 100
+chassis_Ixy: 0
+chassis_Ixz: 0
+chassis_Iyy: 100
+chassis_Iyz: 0
+chassis_Izz: 10
+
+wheel_effort_limit: 10
+wheel_velocity_limit: 100
+
+wheel_radius: 0.2
+wheel_mass: 1
+wheel_Ixx: 10
+wheel_Ixy: 0
+wheel_Ixy: 0
+wheel_Iyy: 1
+wheel_Iyz: 0
+wheel_Izz: 1
+
+wheel_gaz_mu1: 10.0
+wheel_gaz_mu2: 10.0
+wheel_gaz_kp: 10000000.0
+wheel_gaz_kd: 5.0
