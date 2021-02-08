@@ -79,7 +79,7 @@ if __name__ == "__main__":
         final_frame , control_ang, ang_deg = lane_follower.follow_lane(img)
 
         # Slow down if turning
-        steer_speed_scale = 1.0 / (steer_speed_scale * control_ang*control_ang + 1.0)
+        steer_speed_scale = 1.0 / (0.5* control_ang*control_ang + 1.0)
 
         status_msg.control_ang = control_ang
         status_msg.steer_ang_deg = ang_deg
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         dist_right = -2
         try:
             sweep = 0.5
-            front_limit = 1.5
+            front_limit = 0.75
 
             def dist_too_close(dist, close_limit):
                 if dist > 1e-3 and dist < close_limit:
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             dist_front_left = lidar_calc.lidar_data_too_close(lidar, -3.12, -3.12+sweep, front_limit)
             dist_front_right = lidar_calc.lidar_data_too_close(lidar, 3.14-sweep, 3.14, front_limit)
             if dist_too_close(dist_front_left, 0.15) or dist_too_close(dist_front_right, 0.15):
-                lidar_front_speed_scale = 0.0
+                lidar_front_speed_scale = 0.5
             
             # Slow if objects detected to either side
             dist_left = lidar_calc.lidar_data_too_close(lidar, -3, -0.6, 0.25)

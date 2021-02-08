@@ -4,6 +4,11 @@
 mit-racecar/racecar_gazebo
 -->
 
+<xacro:arg name="SENSOR_NOISE" default="0.0"/>
+
+<xacro:include filename="$(find auto_rc_car_description/urdf/car_sensors.urdf.xacro"/>
+<xacro:macro name="car_sensors" NOISE_MAG="${SENSOR_NOISE}"/>
+
 <!-- Set Origin: Center of body lengthwise, height of ~middle of the gearbox -->
 
 <xacro:property name="wheel_y_offset" value="0.115" />
@@ -222,41 +227,6 @@ mit-racecar/racecar_gazebo
    </inertial>
 </link>
 
-<xacro:unless value="$(optenv DISABLE_GAZEBO_LASER false)">
-  <gazebo reference="hoyuko_laser_link">
-    <material>Gazebo/Grey</material>
-    <sensor type="ray" name="hokuyo_sensor">
-      <pose>0 0 0.0124 0 0 0</pose>
-      <visualize>false</visualize>
-      <update_rate>40</update_rate>
-      <ray>
-        <scan>
-          <horizontal>
-            <samples>1081</samples>
-            <resolution>1</resolution>
-            <min_angle>-2.3561944902</min_angle>
-            <max_angle>2.3561944902</max_angle>
-          </horizontal>
-        </scan>
-        <range>
-          <min>0.1</min>
-          <max>10.0</max>
-          <resolution>0.01</resolution>
-        </range>
-        <noise>
-          <mean>0.0</mean>
-          <stddev>0.01</stddev>
-        </noise>
-      </ray>
-      <plugin name="gazebo_ros_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>racecar/out/laser_scan</topicName>
-        <frameName>hoyuko_laser_link</frameName>
-      </plugin>
-    </sensor>
-  </gazebo>
-</xacro:unless>
-
-
   <joint name="camera_optical_joint" type="fixed">
     <!-- these values have to be these values otherwise the gazebo camera
         image won't be aligned properly with the frame it is supposedly
@@ -268,49 +238,5 @@ mit-racecar/racecar_gazebo
 
   <link name="camera_link_optical">
   </link>
-
-  <gazebo reference="kinect_link">
-        <sensor name="camera" type="depth">
-        <pose>0 0 0 0 0 0</pose>
-        <visualize>true</visualize>
-        <update_rate>20</update_rate>
-        <camera>
-          <horizontal_fov>1.047198</horizontal_fov>
-          <image>
-            <width>320</width>
-            <height>240</height>
-            <format>R8G8B8</format>
-          </image>
-          <clip>
-            <near>0.05</near>
-            <far>8</far>
-          </clip>
-        </camera>
-    <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
-      <baseline>0.2</baseline>
-      <alwaysOn>true</alwaysOn>
-      <updateRate>30.0</updateRate>
-      <cameraName>sim_depth_camera</cameraName>
-      <imageTopicName>/racecar/out/stereo_camera/rgb/image</imageTopicName>
-      <cameraInfoTopicName>/racecar/out/stereo_camera/rgb/camera_info</cameraInfoTopicName>
-      <depthImageTopicName>/racecar/out/stereo_camera/depth/image</depthImageTopicName>
-      <depthImageInfoTopicName>/racecar/out/stereo_camera/depth/camera_info</depthImageInfoTopicName>
-      <pointCloudTopicName>/racecar/out/stereo_camera/depth_cloud/points</pointCloudTopicName>
-      <frameName>camera_link_optical</frameName>
-      <pointCloudCutoff>0.05</pointCloudCutoff>
-      <distortionK1>0</distortionK1>
-      <distortionK2>0</distortionK2>
-      <distortionK3>0</distortionK3>
-      <distortionT1>0</distortionT1>
-      <distortionT2>0</distortionT2>
-      <CxPrime>0</CxPrime>
-      <Cx>0</Cx>
-      <Cy>0</Cy>
-      <focalLength>0</focalLength>
-      <hackBaseline>0</hackBaseline>
-    </plugin>
-    </sensor>
-    </gazebo>
-
 
 </robot>
