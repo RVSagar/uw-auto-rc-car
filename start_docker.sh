@@ -72,8 +72,8 @@ CONTAINER_NAME=${IMAGE_NAME}_${USER}
 
 echo Using container: $IMAGE_NAME:$TAG
 
-if ! docker container ps | grep -q ${CONTAINER_NAME}:${TAG}; then
-	echo "Starting new container with name: ${CONTAINER_NAME}:${TAG}"
+if ! docker container ps | grep -q ${CONTAINER_NAME}; then
+	echo "Starting new container with name: ${CONTAINER_NAME}"
 	$DOCKER_COMMAND run \
 	$DOCKER_USER_ARGS \
 	$DOCKER_GPU_ARGS \
