@@ -46,7 +46,7 @@ The easiest way to get up and running with the environment is Docker.
 3. `make` (`make vnc` if running on remote server)
 4. ~~`make nvidia` (if you have an NVIDIA GPU)~~
 5. Start the docker `./start_docker.sh latest yes` or `./start_docker_no_nvidia.sh latest yes` if you don't have an NVIDIA card.
-6. `cd caktin_ws`
+6. `cd catkin_ws`
 7. `catkin build` to build all the packages
 8. `source devel/setup.bash`
 9. `roslaunch auto_rc_car_demos simple_lane_demo_sim.launch` to launch Gazebo and rviz
