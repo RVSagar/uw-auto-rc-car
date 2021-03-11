@@ -15,9 +15,9 @@ mit-racecar/racecar_gazebo
 <!-- Set Origin: Center of body lengthwise, height of ~middle of the gearbox -->
 
 <xacro:property name="wheel_y_offset"       value="${params.get('wheel_y_offset', 0.115)}" />
-<xacro:property name="wheel_z_offset"       value="${params.get('wheel_z_offset', 0.115)}" />
-<xacro:property name="front_wheel_x_offset" value="${params.get('front_wheel_x_offset', 0.14)}" />
-<xacro:property name="rear_wheel_x_offset"  value="${params.get('rear_wheel_x_offset', -0.14)}" />
+<xacro:property name="wheel_z_offset"       value="${params.get('wheel_z_offset', 0.0098)}" />
+<xacro:property name="front_wheel_x_offset" value="${params.get('front_wheel_x_offset', 0.1755)}" />
+<xacro:property name="rear_wheel_x_offset"  value="${params.get('rear_wheel_x_offset', 0.1845)}" />
 
 <xacro:property name="pi_2" value="1.5708" />
 <xacro:property name="pi_4" value="0.7854" />
@@ -30,13 +30,13 @@ mit-racecar/racecar_gazebo
 <xacro:property name="chassis_inertia">
    <inertial>
      <origin xyz="0 0 0" rpy="0 0 0"/>
-     <mass value="${params.get('chassis_mass', 100)}"/>
-     <inertia ixx="${params.get('chassis_Ixx', 100)}"
+     <mass value="${params.get('chassis_mass', 3)}"/>
+     <inertia ixx="${params.get('chassis_Ixx', 3)}"
               ixy="${params.get('chassis_Ixy', 0)}"
               ixz="${params.get('chassis_Ixz', 0)}"
-              iyy="${params.get('chassis_Iyy', 100)}"
+              iyy="${params.get('chassis_Iyy', 3)}"
               iyz="${params.get('chassis_Iyz', 0)}"
-              izz="${params.get('chassis_Izz', 10)}" />
+              izz="${params.get('chassis_Izz', 3)}" />
    </inertial>
 </xacro:property>
 
@@ -47,8 +47,8 @@ mit-racecar/racecar_gazebo
     <parent link="${parent}"/>
     <child link="${name}_link"/>
     <axis xyz="0 0 ${polarity}" />
-    <limit effort="${params.get('wheel_effort_limit', 10)}"
-           velocity="${params.get('wheel_velocity_limit', 10)}" />
+    <limit effort="${params.get('motor_effort_limit', 0.9730)*params.get('drivetrain_radius_b', 0.0413) / params.get('drivetrain_radius_a', 0.01605)}"
+           velocity="${params.get('car_velocity_limit', 15) / params.get('wheel_radius', 0.06)}" />
   </joint>
 
   <transmission name="${name}_transmission" type="SimpleTransmission">
@@ -67,7 +67,7 @@ mit-racecar/racecar_gazebo
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <cylinder length="0.05" radius="${params.get('wheel_radius', 0.1)}" />
+        <cylinder length="0.05" radius="${params.get('wheel_radius', 0.06)}" />
       </geometry>
       <material name="Black">
         <color rgba="0 0 0 1"/>
@@ -75,18 +75,18 @@ mit-racecar/racecar_gazebo
     </visual>
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="${params.get('wheel_mass', 1)}"/>
-      <inertia ixx="${params.get('wheel_Ixx', 10)}"
+      <mass value="${params.get('wheel_mass', 0.01)}"/>
+      <inertia ixx="${params.get('wheel_Ixx', 0.0008)}"
                ixy="${params.get('wheel_Ixy', 0)}"
                ixz="${params.get('wheel_Ixz', 0)}"
-               iyy="${params.get('wheel_Iyy', 1)}"
+               iyy="${params.get('wheel_Iyy', 0.00001)}"
                iyz="${params.get('wheel_Iyz', 0)}"
-               izz="${params.get('wheel_Izz', 1)}" />
+               izz="${params.get('wheel_Izz', 0.00001)}" />
     </inertial>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.05" radius="${params.get('wheel_radius', 0.1)}" />
+        <cylinder length="0.05" radius="${params.get('wheel_radius', 0.06)}" />
       </geometry>
     </collision>
   </link>

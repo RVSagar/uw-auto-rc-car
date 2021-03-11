@@ -56,7 +56,7 @@ class HandCodedLaneFollower():
         if len(lane_lines) == 0:
             logging.error('No lane lines detected, nothing to do.')
             print("No lane lines detected, nothing to do.")
-            return frame, self.convert_to_api_steer(self.curr_steering_angle)
+            return frame, self.convert_to_api_steer(self.curr_steering_angle), self.curr_steering_angle
 
         new_steering_angle = self.compute_steering_angle(frame, lane_lines)
         self.curr_steering_angle = self.stabilize_steering_angle(self.curr_steering_angle, new_steering_angle, len(lane_lines))

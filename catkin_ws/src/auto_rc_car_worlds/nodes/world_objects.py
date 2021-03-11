@@ -51,8 +51,11 @@ class Pedestrian:
             self.pub.publish(p)
 
     def can_move(self, t):
-        pose, twist = self.world_obs.get(self.ns)
-        car_pose, car_twist = self.world_obs.get("racecar")
+        try:
+            pose, twist = self.world_obs.get(self.ns)
+            car_pose, car_twist = self.world_obs.get("racecar")
+        except ValueError as e:
+            return False
 
         w = pose.orientation.w
         yaw = 2.0 * math.acos(w)

@@ -6,7 +6,7 @@ import time
 
 from std_msgs.msg import Float64
 
-from world_objects import StopLight, Pedestrian
+from world_objects import StopLight, Pedestrian, WorldObserver, WorldController
 
 
 if __name__ == "__main__":
@@ -24,6 +24,6 @@ if __name__ == "__main__":
     ped1 = Pedestrian("pedestrian1", 10, 28, dt, WO)
     pedestrians = [ped0, ped1]
 
-    c = WorldController(stoplights, pedestrians)
+    c = WorldController(stoplights, pedestrians, dt, WO)
     c.run()
 
