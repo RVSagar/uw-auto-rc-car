@@ -236,7 +236,7 @@ if __name__ == '__main__':
     rospack = rospkg.RosPack()
     package_dir = rospack.get_path("road_dataset_generation")
 
-    with open(package_dir + '/config/generation_config.yaml') as file:
+    with open(package_dir + '/config/test_generation_config.yaml') as file:
         settings = yaml.load(file, Loader=yaml.SafeLoader)
     g = Generator(settings, package_dir)
     g.run()
