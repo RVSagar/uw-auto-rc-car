@@ -5,29 +5,31 @@ chassis_width: 0.13
 chassis_height: 0.05
 
 wheel_y_offset: 0.115
-wheel_z_offset: -0.03
-front_wheel_x_offset: -0.14
-rear_wheel_x_offset: 0.14
+wheel_z_offset: 0.0098
+front_wheel_x_offset: -0.1755
+rear_wheel_x_offset: 0.1845
 
-chassis_mass: 100
-chassis_Ixx: 100
+chassis_mass: 3
+chassis_Ixx: 3
 chassis_Ixy: 0
 chassis_Ixz: 0
-chassis_Iyy: 100
+chassis_Iyy: 3
 chassis_Iyz: 0
-chassis_Izz: 10
+chassis_Izz: 3
 
-wheel_effort_limit: 10
-wheel_velocity_limit: 100
+motor_effort_limit: 0.9730
+drivetrain_radius_a: 0.01605
+drivetrain_radius_b: 0.0413
+car_velocity_limit: 15
 
-wheel_radius: 0.1
-wheel_mass: 1
-wheel_Ixx: 10
+wheel_radius: 0.06
+wheel_mass: 0.01
+wheel_Ixx: 0.0008
 wheel_Ixy: 0
 wheel_Ixy: 0
-wheel_Iyy: 1
+wheel_Iyy: 0.00001
 wheel_Iyz: 0
-wheel_Izz: 1
+wheel_Izz: 0.00001
 
 wheel_gaz_mu1: 10.0
 wheel_gaz_mu2: 10.0
