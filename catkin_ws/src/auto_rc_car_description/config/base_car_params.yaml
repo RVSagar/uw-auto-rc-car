@@ -31,7 +31,11 @@ wheel_Iyy: 0.00001
 wheel_Iyz: 0
 wheel_Izz: 0.00001
 
-wheel_gaz_mu1: 10.0
-wheel_gaz_mu2: 10.0
-wheel_gaz_kp: 10000000.0
-wheel_gaz_kd: 5.0
+wheel_gaz_kp: 200000.0
+wheel_gaz_kd: 50.0
+
+# https://www.engineeringtoolbox.com/friction-coefficients-d_778.html
+# March 23, 2021
+# Rubber / Dry Asphalt  0.9
+wheel_gaz_mu1: 0.9
+wheel_gaz_mu2: 0.7

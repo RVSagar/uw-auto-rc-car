@@ -142,7 +142,7 @@ mit-racecar/racecar_gazebo
 
 
 <joint name="front_steer_joint" type="revolute">
-  <origin xyz="${front_wheel_x_offset} 0 ${wheel_z_offset}" rpy="0 0 0"/>
+  <origin xyz="${-front_wheel_x_offset} 0 ${wheel_z_offset}" rpy="0 0 0"/>
     <parent link="chassis_link"/>
     <child link="front_steer_link"/>
     <axis xyz="0 0 1" />
@@ -186,11 +186,11 @@ mit-racecar/racecar_gazebo
 </xacro:wheel>
 
 <xacro:wheel name="left_rear_wheel" parent="chassis_link" j_type="continuous" polarity="1">
-  <origin xyz="${rear_wheel_x_offset} -${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 0"/>
+  <origin xyz="${-rear_wheel_x_offset} -${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 0"/>
 </xacro:wheel>
 
 <xacro:wheel name="right_rear_wheel" parent="chassis_link" j_type="continuous" polarity="-1">
-  <origin xyz="${rear_wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${pi/2} 0 0"/>
+  <origin xyz="${-rear_wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${pi/2} 0 0"/>
 </xacro:wheel>
 
 
