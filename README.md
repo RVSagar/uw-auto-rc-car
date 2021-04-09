@@ -1,5 +1,4 @@
-# uw-auto-rc-car
-Autonomous RC car project for a future University of Waterloo Mechatronics course.
+# UW AUTO RC CAR
 
 ## Accessing the images and yaml files
 
