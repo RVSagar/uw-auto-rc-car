@@ -16,11 +16,17 @@ The rest of the models (for the other yaml parameters) are at: https://drive.goo
 
 ### Here are some websites and courses that I found useful:
 The machine learning course by Stanford on Coursera: https://www.coursera.org/learn/machine-learning
+
 Keras API docs: https://keras.io/api/
+
 Tutorial of a CIFAR-10 CNN: https://machinelearningmastery.com/how-to-develop-a-cnn-from-scratch-for-cifar-10-photo-classification/ (other tutorials on this website are also useful)
+
 How to install Anaconda: https://docs.anaconda.com/anaconda/install/windows/ 
+
 How to install Tensorflow: How to Install TensorFlow on Windows - Shawn Hymel (for CPU)
+
 https://shawnhymel.com/1961/how-to-install-tensorflow-with-gpu-support-on-windows/ (for GPU)
+
 How to install Keras (make sure to have python and tensorflow first): How to Install Keras | Liquid Web
 
 ### Setting up the machine learning environment (windows):
