@@ -1,5 +1,6 @@
 # UW AUTO RC CAR
 
+### Folder Structure
 Below is the folder structure needed in the root of the notebook. The names with extensions (.png, .yaml, .ipynb) are files while the names without extensions are folders. The indentation is representative of the tree structure, if the strucutre is changed, make sure to change the code folder structure for root:
 ```
 root
@@ -39,7 +40,7 @@ How to install Tensorflow:
 How to install Keras (make sure to have python and tensorflow first): https://www.liquidweb.com/kb/how-to-install-keras/
 
 Car Deep Learning Resources (Including theory and code - **Very Useful**)
-1. (**Part 4**) - https://towardsdatascience.com/deeppicar-part-4-lane-following-via-opencv-737dd9e47c96\
+1. (Part 4) - https://towardsdatascience.com/deeppicar-part-4-lane-following-via-opencv-737dd9e47c96\
 2. (**Part 5**) - https://towardsdatascience.com/deeppicar-part-5-lane-following-via-deep-learning-d93acdce6110
 
 ### Setting up the machine learning environment (Windows and Ubuntu):
