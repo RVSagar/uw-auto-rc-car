@@ -1,7 +1,7 @@
 # UW AUTO RC CAR
 
 Below is the folder structure needed in the root of the notebook. The names with extensions (.png, .yaml, .ipynb) are files while the names without extensions are folders. The indentation is representative of the tree structure, if the strucutre is changed, make sure to change the code folder structure for root:
-`
+```
 root
     -> data
         -> allInputImages.png
@@ -14,7 +14,7 @@ root
         -> allValidationImages.png
         -> allValidationYamls.yaml
     -> Model Training.ipynb
-`
+```
 ## Accessing the models
 My outputted models can be found at : https://drive.google.com/drive/folders/1UzmW-JChktQwJZk2Tn8MUZN_fjMN7F6x?usp=sharing
 
