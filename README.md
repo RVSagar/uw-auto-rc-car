@@ -1,6 +1,7 @@
 # UW AUTO RC CAR
 
-## Below is the folder structure needed in the root of the notebook. The names with extensions (.png, .yaml, .ipynb) are files while the names without extensions are folders. The indentation is representative of the tree structure, if the strucutre is changed, make sure to change the code folder structure for root:
+Below is the folder structure needed in the root of the notebook. The names with extensions (.png, .yaml, .ipynb) are files while the names without extensions are folders. The indentation is representative of the tree structure, if the strucutre is changed, make sure to change the code folder structure for root:
+`
 root
     -> data
         -> allInputImages.png
@@ -13,7 +14,7 @@ root
         -> allValidationImages.png
         -> allValidationYamls.yaml
     -> Model Training.ipynb
-
+`
 ## Accessing the models
 My outputted models can be found at : https://drive.google.com/drive/folders/1UzmW-JChktQwJZk2Tn8MUZN_fjMN7F6x?usp=sharing
 
@@ -38,8 +39,8 @@ How to install Tensorflow:
 How to install Keras (make sure to have python and tensorflow first): https://www.liquidweb.com/kb/how-to-install-keras/
 
 Car Deep Learning Resources (Including theory and code - **Very Useful**)
-4. (**Part 4**) - https://towardsdatascience.com/deeppicar-part-4-lane-following-via-opencv-737dd9e47c96\
-5. (**Part 5**) - https://towardsdatascience.com/deeppicar-part-5-lane-following-via-deep-learning-d93acdce6110
+1. (**Part 4**) - https://towardsdatascience.com/deeppicar-part-4-lane-following-via-opencv-737dd9e47c96\
+2. (**Part 5**) - https://towardsdatascience.com/deeppicar-part-5-lane-following-via-deep-learning-d93acdce6110
 
 ### Setting up the machine learning environment (Windows and Ubuntu):
 1.	Install Anaconda
