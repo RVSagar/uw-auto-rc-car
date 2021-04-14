@@ -1,3 +1,0 @@
-<launch>
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find auto_rc_car_description)/config/car_viz_local.rviz" required="true" />
-</launch>
