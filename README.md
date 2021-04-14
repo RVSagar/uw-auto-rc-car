@@ -22,11 +22,11 @@ Tutorial of a CIFAR-10 CNN: https://machinelearningmastery.com/how-to-develop-a-
 
 How to install Anaconda: https://docs.anaconda.com/anaconda/install/windows/ 
 
-How to install Tensorflow: How to Install TensorFlow on Windows - Shawn Hymel (for CPU)
+How to install Tensorflow: https://shawnhymel.com/2034/how-to-install-tensorflow-on-windows/ (for CPU)
 
 https://shawnhymel.com/1961/how-to-install-tensorflow-with-gpu-support-on-windows/ (for GPU)
 
-How to install Keras (make sure to have python and tensorflow first): How to Install Keras | Liquid Web
+How to install Keras (make sure to have python and tensorflow first): https://www.liquidweb.com/kb/how-to-install-keras/
 
 ### Setting up the machine learning environment (windows):
 1.	Install Anaconda
