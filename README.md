@@ -41,5 +41,5 @@ How to install Keras (make sure to have python and tensorflow first): https://ww
 
 ### Diagram of our Convolutional Neural Network
  	
-Our convolutional neural network was based off the one above (https://arxiv.org/pdf/1604.07316.pdf). The input plane had 3 filters and the following Conv2D layers had 24, 36, 48 and 64 filters, respectively. The activation function that was used for all of the layers was the relu function. 
+Our convolutional neural network was based off the one at https://arxiv.org/pdf/1604.07316.pdf. The input plane had 3 filters and the following Conv2D layers had 24, 36, 48 and 64 filters, respectively. The activation function that was used for all of the layers was the relu function. 
 
