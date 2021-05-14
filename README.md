@@ -41,7 +41,7 @@ The easiest way to get up and running with the environment is Docker.
     ```
 
 ## TLDR Quick start guide to test lane following in simulation:
-0. `https://github.com/RVSagar/uw-auto-rc-car.git`
+0. `git clone https://github.com/RVSagar/uw-auto-rc-car.git`
 1. `cd uw-auto-rc-car`
 3. `git submodule update --init --recursive`
 4. `make` (`make vnc` if running on remote server)
