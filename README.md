@@ -41,16 +41,17 @@ The easiest way to get up and running with the environment is Docker.
     ```
 
 ## TLDR Quick start guide to test lane following in simulation:
-1. Go to root folder
-2. `git submodule update --init --recursive`
-3. `make` (`make vnc` if running on remote server)
-4. ~~`make nvidia` (if you have an NVIDIA GPU)~~
-5. Start the docker `./start_docker.sh latest yes` or `./start_docker_no_nvidia.sh latest yes` if you don't have an NVIDIA card.
-6. `cd catkin_ws`
-7. `catkin build` to build all the packages
-8. `source devel/setup.bash`
-9. `roslaunch auto_rc_car_demos simple_lane_demo_sim.launch` to launch Gazebo and rviz
-10. Open a new terminal and type `rosrun auto_rc_car_demos simple_lane_drive.py`
+0. `https://github.com/RVSagar/uw-auto-rc-car.git`
+1. `cd uw-auto-rc-car`
+3. `git submodule update --init --recursive`
+4. `make` (`make vnc` if running on remote server)
+5. ~~`make nvidia` (if you have an NVIDIA GPU)~~
+6. Start the docker `./start_docker.sh latest yes` or `./start_docker_no_nvidia.sh latest yes` if you don't have an NVIDIA card.
+7. `cd catkin_ws`
+8. `catkin build` to build all the packages
+9. `source devel/setup.bash`
+10. `roslaunch auto_rc_car_demos simple_lane_demo_sim.launch` to launch Gazebo and rviz
+11. Open a new terminal and type `rosrun auto_rc_car_demos simple_lane_drive.py`
 
 `simple_lane_demo_sim.launch` has a few optional command line arguments such as `record:=true` to enable logging via a rosbag, `bag_prefix:=MY_PREFIX` to specify a file name prefix for that rosbag, and `topics:="TOPIC1 TOPIC2"` to choose what topics to record (record all if left unspecified). If multiple arguments are supplemented, separate them with whitespace.
 
