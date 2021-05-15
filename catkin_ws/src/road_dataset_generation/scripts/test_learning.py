@@ -126,5 +126,7 @@ if __name__ == "__main__":
     opt = SGD(lr=0.01, momentum=0.9, clipnorm=1)
     model.compile(optimizer=opt, loss='mse', metrics=['mse'])
 
-    history = model.fit(X_train, Y_train, epochs=50, batch_size=32, validation_data=(X_val, Y_val), verbose=1)
+    history = model.fit(X_train, Y_train, epochs=10, batch_size=32, validation_data=(X_val, Y_val), verbose=1)
     #print(model.predict(X_train))
+
+    model.save(package_dir + '/output/models/' + settings['model_name'] + '.model')
