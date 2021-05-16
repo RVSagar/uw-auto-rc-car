@@ -11,14 +11,25 @@ import rospkg
 import pickle as pk
 import sklearn.model_selection
 
+import tensorflow as tf
+from tensorflow.python.client import device_lib
+import keras.models
 from keras.models import Sequential
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LeakyReLU
+from keras.layers import Dropout
 from keras.optimizers import SGD
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
+print(device_lib.list_local_devices())
+
+PREPROCESS_VERSION = 4
+
+OUT_HEIGHT=120
+OUT_WIDTH=160
 
 def arrange_data(dataset, name):
     print("Arranging: %s" % name)
@@ -28,7 +39,7 @@ def arrange_data(dataset, name):
     D = [dat[2] for dat in dataset]
 
     X = np.array(X)
-    X = X.reshape([-1,60,80,1])
+    X = X.reshape([-1,OUT_HEIGHT,OUT_WIDTH,1])
 
     Y = np.array(Y)
     Y = Y.reshape([-1, 3])
@@ -42,54 +53,87 @@ def preprocess_data(X, D):
 
     # HEIGHT = 480
     # WIDTH = 640
-    small = cv2.resize(grey, (80, 60))
+    small = cv2.resize(grey, (OUT_WIDTH, OUT_HEIGHT))
+    #cv2.imshow('image',small)
+    #cv2.waitKey(0)
+
+    small = small/255.0 - 0.5
 
     Y = np.array([[D['X0']],
                   [D['YAW0']],
                   [D['inv_rad']]])
+    
     return (small, Y, D)
 
-def load_datasets(pkg_dir, settings):
-    dataset = []
+def load_dataset(pkg_dir, settings, sub_dir):
+    dataset_dir = pkg_dir + "/output/" + sub_dir + "/"
+    data_dir = dataset_dir + "data/"
+    info_dir = dataset_dir + "info/"
 
-    sub_dir_hash = 0
-    for sub_dir in settings['sub_dirs']:
-        sub_dir_hash = sub_dir_hash + hash(sub_dir)
-    dataset_pickle = pkg_dir + "/output/" + str(sub_dir_hash) + ".pk"
+    with open(dataset_dir + "/gen_settings.yaml", 'r') as sett_file:
+        gen_sett = yaml.load(sett_file)
+
+    def make_hash(obj):
+        if isinstance(obj, (set, tuple, list)):
+            return hash(tuple([make_hash(o) for o in obj]))
+        elif isinstance(obj, dict):
+            return make_hash([obj[k] for k in obj.keys()])
+        elif isinstance(obj, np.ndarray):
+            return hash(str(obj)) # imperfect; string does not show all data
+        else:
+            print(obj)
+            return hash(obj)
     
+    dataset_hash = make_hash(gen_sett) + hash(PREPROCESS_VERSION)
+    dataset_pickle = dataset_dir + str(dataset_hash) + ".pk"
     if os.path.exists(dataset_pickle):
-        print("Loading existing dataset")
+        print("Loading existing dataset: " + sub_dir)
         with open(dataset_pickle, 'r') as file:
             return pk.load(file)
-    print("Loading dataset from files")
+    print("Loading dataset from files in: " + sub_dir)
 
-    for sub_dir in settings['sub_dirs']:
-        dataset_dir = pkg_dir + "/output/" + sub_dir + "/"
+    dataset = []
 
-        data_dir = dataset_dir + "data/"
-        info_dir = dataset_dir + "info/"
+    info_files = os.listdir(info_dir)
+    for f in info_files:
+        if not f.endswith('.yaml'):
+            continue
+        f = f.split('.yaml')[0]
+        
+        image_file = data_dir + f + ".png"
+        info_file = info_dir + f + ".yaml"
 
-        info_files = os.listdir(info_dir)
+        image = cv2.imread(image_file, cv2.IMREAD_UNCHANGED)
 
-        for f in info_files:
-            if not f.endswith('.yaml'):
-                continue
-            f = f.split('.yaml')[0]
-            
-            image_file = data_dir + f + ".png"
-            info_file = info_dir + f + ".yaml"
+        with open(info_file, 'r') as file:
+            info = yaml.load(file, Loader=yaml.SafeLoader)
 
-            image = cv2.imread(image_file, cv2.IMREAD_UNCHANGED)
+        sample = preprocess_data(image, info)
+        sample[2]['flipped'] = False
+        dataset.append(sample)
+        #cv2.imshow('image',sample[0])
+        #print(sample[1])
+        #cv2.waitKey(0)
 
-            with open(info_file, 'r') as file:
-                info = yaml.load(file, Loader=yaml.SafeLoader)
-
-            sample = preprocess_data(image, info)
-            dataset.append(sample)
+        flip_sample = (np.flip(sample[0],1), -sample[1], sample[2])
+        flip_sample[2]['flipped'] = True
+        dataset.append(flip_sample)
+        #cv2.imshow('flipped',flip_sample[0])
+        #print(flip_sample[1])
+        #cv2.waitKey(0)
 
     print("Saving dataset to %s" % dataset_pickle)
     with open(dataset_pickle, 'w') as file:
         pk.dump(dataset, file)
+    return dataset
+
+
+def load_datasets(pkg_dir, settings):
+    dataset = []
+
+    for sub_dir in settings['sub_dirs']:
+        dataset = dataset + load_dataset(pkg_dir, settings, sub_dir)
+
     return dataset
 
 
@@ -99,6 +143,8 @@ if __name__ == "__main__":
 
     with open(package_dir + "/config/test_learning_config.yaml", 'r') as file:
             settings = yaml.load(file, Loader=yaml.SafeLoader)
+
+    model_name = package_dir + '/output/models/' + settings['model_name'] + '.model'
 
     dataset = load_datasets(package_dir, settings)
     print("Loaded dataset of %d files" % len(dataset))
@@ -110,23 +156,50 @@ if __name__ == "__main__":
     X_val, Y_val, D_val = arrange_data(validation_set, "Validation")
     X_test, Y_test, D_test = arrange_data(test_set, "Test")
 
-    model = Sequential()
-    model.add(Conv2D(32, (5, 5), input_shape=(60,80,1)))
-    model.add(LeakyReLU(alpha=0.3))
-    model.add(Conv2D(32, (5, 5)))
-    model.add(LeakyReLU(alpha=0.3))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(Conv2D(32, (5, 5)))
-    model.add(LeakyReLU(alpha=0.3))
-    model.add(Flatten())
-    model.add(Dense(100))
-    model.add(LeakyReLU(alpha=0.3))
-    model.add(Dense(3, activation=None))
-    # compile model
-    opt = SGD(lr=0.01, momentum=0.9, clipnorm=1)
-    model.compile(optimizer=opt, loss='mse', metrics=['mse'])
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/10))
+    mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
 
-    history = model.fit(X_train, Y_train, epochs=10, batch_size=32, validation_data=(X_val, Y_val), verbose=1)
+    if os.path.exists(model_name) and settings['load_latest']:
+        model = keras.models.load_model(model_name)
+
+        X = X_train[0]
+        X = X.reshape([-1, OUT_HEIGHT, OUT_WIDTH, 1])
+        Y = Y_train[0]
+        Yp = model.predict([X])
+        print(Y)
+        print(Yp)
+        print(Y-Yp)
+        if not settings['train_existing']:
+            exit()
+    else:
+        model = Sequential()
+        model.add(Conv2D(16, (5, 5), input_shape=(OUT_HEIGHT,OUT_WIDTH,1)))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(Conv2D(32, (5, 5)))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(MaxPooling2D((2, 2)))
+        model.add(Conv2D(32, (5, 5)))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(MaxPooling2D((2, 2)))
+        model.add(Flatten())
+        model.add(Dense(100))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(Dense(3, activation=None))
+        # compile model
+        opt = SGD(lr=0.01, momentum=0.9, clipnorm=1)
+        model.compile(optimizer=opt, loss='mse', metrics=['mse'])
+
+    print(model.summary())
+    history = model.fit(X_train, Y_train,
+                        epochs=settings['epochs'],
+                        batch_size=16,
+                        validation_data=(X_val, Y_val),
+                        callbacks=[es, mc],
+                        verbose=1)
     #print(model.predict(X_train))
 
-    model.save(package_dir + '/output/models/' + settings['model_name'] + '.model')
+    #model.save(model_name)
