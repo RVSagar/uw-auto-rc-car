@@ -4,7 +4,7 @@ import numpy as np
 import logging
 
 
-_SHOW_IMAGE = True
+_SHOW_IMAGE = False
 #BLACK_MIN = np.array([0, 0, 0],np.uint8)
 #BLACK_MAX = np.array([180, 255, 90],np.uint8)
 sensitivity = 40
@@ -299,6 +299,17 @@ class HandCodedLaneFollower():
         x1 = max(-width, min(2 * width, int((y1 - intercept) / slope)))
         x2 = max(-width, min(2 * width, int((y2 - intercept) / slope)))
         return [[x1, y1, x2, y2]]
+
+    ############################
+    # Test Functions
+    ############################
+    def test_photo(self, file):
+        frame = cv2.imread(file)
+        final_frame, final_steering_angle, ang_deg = self.follow_lane(frame)
+        self.show_image('final', final_frame, True)
+        print('Final steering angle: ', final_steering_angle)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 
 

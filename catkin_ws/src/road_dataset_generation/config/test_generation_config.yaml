@@ -1,23 +1,23 @@
 subdir: test # images and info get put in 'output/[subdir]'
 notes: "" # Extra note you want to add
 clear: True # Will remove existing files in subdir if True. Will prompt before deleting
-N: 1000 # Number of images to generate
+N: 5 # Number of images to generate
 road_image_files: # List of road image files to use
-  - road0.png
-  - road1.png
+  - road0-1lane.png
+  - road1-1lane.png
 background_image_files: # List of background image files to use
   - background0.png
   - background1.png
 
 # Road Start
-X0: [-1.0, 1.0] # Road will be offset left-right within this range
+X0: [-0.1, 0.1] # Road will be offset left-right within this range
 Y0: [0, 0] # Road will be offset forward-backward within this range
 YAW0: [-0.5, 0.5] # Road will start with an initial angle (rad) within this range
 
 # Road Properties
 prob_straight: 0.2 # probability that the road will be straight
 inv_radius: [0.000001, 0.1] # Inverse of the radius of a curved road
-ROAD_WIDTH: [4.9, 5.1] # Width of the road
+ROAD_WIDTH: [2, 3] # Width of the road
 
 # Other Properties
 DY: [0.2, 0.25] # Roads will be generated in segments of this width
