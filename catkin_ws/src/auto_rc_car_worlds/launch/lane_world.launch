@@ -1,9 +1,13 @@
 <launch>
   <arg name="CAR_CONFIG" default="base_car_params.yaml"/>
+  
+  <arg name="blank" default="false"/>
+  <arg name="world_name" value="blank_lane_world.sdf" if="$(arg blank)"/>
+  <arg name="world_name" value="lane_world.sdf" unless="$(arg blank)"/>
 
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find auto_rc_car_worlds)/worlds/lane_world.sdf"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+    <arg name="world_name" value="$(find auto_rc_car_worlds)/worlds/$(arg world_name)"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
@@ -19,36 +23,41 @@
   </include>
   <include file="$(find auto_rc_car_control)/launch/start_car_sim_controls.launch"/>
 
-  <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
-    <arg name="ns" value="sign0"/>
-    <arg name="x" value="4.0"/>
-    <arg name="y" value="-0.75"/>
-    <arg name="yaw" value="0"/>
-    <arg name="scale" value="1.0"/>
-  </include>
 
-  <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
-    <arg name="ns" value="sign1"/>
-    <arg name="x" value="13"/>
-    <arg name="y" value="0.75"/>
-    <arg name="yaw" value="0"/>
-    <arg name="scale" value="1.0"/>
-  </include>
+  <group unless="$(arg blank)">
+
+    <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
+      <arg name="ns" value="sign0"/>
+      <arg name="x" value="4.0"/>
+      <arg name="y" value="-0.75"/>
+      <arg name="yaw" value="0"/>
+      <arg name="scale" value="1.0"/>
+    </include>
+
+    <include file="$(find auto_rc_car_worlds)/launch/load_stoplight.launch">
+      <arg name="ns" value="sign1"/>
+      <arg name="x" value="13"/>
+      <arg name="y" value="0.75"/>
+      <arg name="yaw" value="0"/>
+      <arg name="scale" value="1.0"/>
+    </include>
 
 
-  <include file="$(find auto_rc_car_worlds)/launch/load_pedestrian.launch">
-    <arg name="ns" value="pedestrian0"/>
-    <arg name="x" value="2"/>
-    <arg name="y" value="-0.75"/>
-    <arg name="yaw" value="0"/>
-  </include>
+    <include file="$(find auto_rc_car_worlds)/launch/load_pedestrian.launch">
+      <arg name="ns" value="pedestrian0"/>
+      <arg name="x" value="2"/>
+      <arg name="y" value="-0.75"/>
+      <arg name="yaw" value="0"/>
+    </include>
 
-  <include file="$(find auto_rc_car_worlds)/launch/load_pedestrian.launch">
-    <arg name="ns" value="pedestrian1"/>
-    <arg name="x" value="9"/>
-    <arg name="y" value="0.75"/>
-    <arg name="yaw" value="0"/>
-  </include>
+    <include file="$(find auto_rc_car_worlds)/launch/load_pedestrian.launch">
+      <arg name="ns" value="pedestrian1"/>
+      <arg name="x" value="9"/>
+      <arg name="y" value="0.75"/>
+      <arg name="yaw" value="0"/>
+    </include>
 
-  <node name="lane_controller" pkg="auto_rc_car_worlds" type="lane_world_control.py"/>
+    <node name="lane_controller" pkg="auto_rc_car_worlds" type="lane_world_control.py"/>
+
+  </group>
 </launch>

@@ -1,6 +1,7 @@
 <launch>
     <!--name of gazebo launch file, without '_world.launch'-->
     <arg name="world" default="lane"/>
+    <arg name="blank" default="false"/>>
     <arg name="viz_type" default="local"/>
     <arg name="run_as_remote" default="false"/>
     <arg name="run_client" default="true"/>
@@ -11,7 +12,9 @@
 
     <param name="client_comm_type" value="local"/>
     <param name="client_context_type" value="sim"/>
-    <include file="$(find auto_rc_car_worlds)/launch/$(arg world)_world.launch"/>
+    <include file="$(find auto_rc_car_worlds)/launch/$(arg world)_world.launch">
+        <arg name="blank" value="$(arg blank)"/>
+    </include>
 
 
     <include file="$(find auto_rc_car_description)/launch/viz_car_$(arg viz_type).launch"/>
