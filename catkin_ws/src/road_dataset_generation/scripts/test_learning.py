@@ -26,7 +26,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 print(device_lib.list_local_devices())
 
-PREPROCESS_VERSION = 4
+PREPROCESS_VERSION = 5
 
 OUT_HEIGHT=120
 OUT_WIDTH=160
@@ -58,6 +58,7 @@ def preprocess_data(X, D):
     #cv2.waitKey(0)
 
     small = small/255.0 - 0.5
+    
 
     Y = np.array([[D['X0']],
                   [D['YAW0']],
@@ -95,7 +96,10 @@ def load_dataset(pkg_dir, settings, sub_dir):
     dataset = []
 
     info_files = os.listdir(info_dir)
+    i = 0
     for f in info_files:
+        i = i + 1
+        print("Loading file %d of %d" % (i, len(info_files)))
         if not f.endswith('.yaml'):
             continue
         f = f.split('.yaml')[0]
@@ -108,19 +112,25 @@ def load_dataset(pkg_dir, settings, sub_dir):
         with open(info_file, 'r') as file:
             info = yaml.load(file, Loader=yaml.SafeLoader)
 
-        sample = preprocess_data(image, info)
-        sample[2]['flipped'] = False
-        dataset.append(sample)
-        #cv2.imshow('image',sample[0])
-        #print(sample[1])
+        orig_sample = preprocess_data(image, info)
+        #cv2.imshow('orig', orig_sample[0] + 0.5)
         #cv2.waitKey(0)
 
-        flip_sample = (np.flip(sample[0],1), -sample[1], sample[2])
-        flip_sample[2]['flipped'] = True
-        dataset.append(flip_sample)
-        #cv2.imshow('flipped',flip_sample[0])
-        #print(flip_sample[1])
-        #cv2.waitKey(0)
+        for flip in [False, True]:
+            for intensity in [1.0, 0.75, 0.5]:
+                sample = orig_sample
+
+                sample[2]['flipped'] = flip
+                if flip:
+                    sample = (np.flip(sample[0],1), -sample[1], sample[2])
+
+                sample[2]['intensity'] = intensity
+                sample = (intensity * (sample[0] + 0.5) - 0.5, sample[1], sample[2])
+                
+                dataset.append(sample)
+                #cv2.imshow('image - %s - %s' % (str(flip), str(intensity)),sample[0] + 0.5)
+                #print(sample[1])
+                #cv2.waitKey(0)
 
     print("Saving dataset to %s" % dataset_pickle)
     with open(dataset_pickle, 'w') as file:
@@ -156,7 +166,7 @@ if __name__ == "__main__":
     X_val, Y_val, D_val = arrange_data(validation_set, "Validation")
     X_test, Y_test, D_test = arrange_data(test_set, "Test")
 
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/10))
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
     mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
 
     if os.path.exists(model_name) and settings['load_latest']:
