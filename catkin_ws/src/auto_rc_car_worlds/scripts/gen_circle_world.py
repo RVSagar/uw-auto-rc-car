@@ -48,5 +48,5 @@ if __name__ == "__main__":
                 model = inner_houses[i]
                 wb.add(contents, wb.generate_house_contents(model, x, y, th+1.5707))
 
-    wb.write_dest(contents)
+        wb.write_dest(contents)
 
