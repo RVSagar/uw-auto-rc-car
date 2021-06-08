@@ -1,0 +1,221 @@
+<sdf version='1.6'>
+  <world name='default'>
+    <scene>
+      <grid>1</grid>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose frame=''>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <model name='ground'>
+      <link name='body'>
+        <collision name='geom'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1 1</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+          <visual name="grass">
+            <pose>0 0 -0.1 0 0 0</pose>
+            <cast_shadows>false</cast_shadows>
+            <geometry>
+              <plane>
+                <normal>0 0 1</normal>
+                <size>100 100</size>
+              </plane>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Grass</name>
+              </script>
+            </material>
+          </visual>
+      </link>
+      <static>1</static>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics name='default_physics' default='0' type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <state world_name='default'>
+      <sim_time>0 0</sim_time>
+      <real_time>0 0</real_time>
+      <wall_time>0 0</wall_time>
+      <iterations>0</iterations>
+    
+      <model name='ground'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='body'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose frame=''>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose frame=''>-8.78783 -24.5459 10.6144 0 0.271643 1.07619</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    
+<road name='gen_road1'>
+<width>0.917500</width>
+<point>8.125000 8.125000 0.000000</point>
+<point>8.108606 8.640878 0.000000</point>
+<point>8.059491 9.154673 0.000000</point>
+<point>7.977853 9.664314 0.000000</point>
+<point>7.864021 10.167743 0.000000</point>
+<point>7.718455 10.662928 0.000000</point>
+<point>7.541742 11.147873 0.000000</point>
+<point>7.334595 11.620618 0.000000</point>
+<point>7.097850 12.079258 0.000000</point>
+<point>6.832462 12.521940 0.000000</point>
+<point>6.539503 12.946880 0.000000</point>
+<point>6.220155 13.352361 0.000000</point>
+<point>5.875706 13.736747 0.000000</point>
+<point>5.507546 14.098488 0.000000</point>
+<point>5.117161 14.436124 0.000000</point>
+<point>4.706126 14.748292 0.000000</point>
+<point>4.276100 15.033733 0.000000</point>
+<point>3.828819 15.291294 0.000000</point>
+<point>3.366087 15.519936 0.000000</point>
+<point>2.889771 15.718737 0.000000</point>
+<point>2.401794 15.886895 0.000000</point>
+<point>1.904125 16.023730 0.000000</point>
+<point>1.398772 16.128690 0.000000</point>
+<point>0.887775 16.201353 0.000000</point>
+<point>0.373195 16.241425 0.000000</point>
+<point>-0.142891 16.248743 0.000000</point>
+<point>-0.658401 16.223280 0.000000</point>
+<point>-1.171253 16.165136 0.000000</point>
+<point>-1.679379 16.074548 0.000000</point>
+<point>-2.180728 15.951880 0.000000</point>
+<point>-2.673277 15.797628 0.000000</point>
+<point>-3.155039 15.612413 0.000000</point>
+<point>-3.624068 15.396984 0.000000</point>
+<point>-4.078473 15.152210 0.000000</point>
+<point>-4.516420 14.879078 0.000000</point>
+<point>-4.936141 14.578691 0.000000</point>
+<point>-5.335944 14.252261 0.000000</point>
+<point>-5.714213 13.901105 0.000000</point>
+<point>-6.069424 13.526641 0.000000</point>
+<point>-6.400142 13.130378 0.000000</point>
+<point>-6.705033 12.713917 0.000000</point>
+<point>-6.982866 12.278938 0.000000</point>
+<point>-7.232522 11.827196 0.000000</point>
+<point>-7.452991 11.360515 0.000000</point>
+<point>-7.643384 10.880776 0.000000</point>
+<point>-7.802934 10.389918 0.000000</point>
+<point>-7.930995 9.889919 0.000000</point>
+<point>-8.027052 9.382798 0.000000</point>
+<point>-8.090717 8.870602 0.000000</point>
+<point>-8.121733 8.355397 0.000000</point>
+<point>-8.119974 7.839262 0.000000</point>
+<point>-8.085448 7.324280 0.000000</point>
+<point>-8.018294 6.812529 0.000000</point>
+<point>-7.918784 6.306075 0.000000</point>
+<point>-7.787318 5.806961 0.000000</point>
+<point>-7.624427 5.317201 0.000000</point>
+<point>-7.430769 4.838771 0.000000</point>
+<point>-7.207125 4.373603 0.000000</point>
+<point>-6.954397 3.923573 0.000000</point>
+<point>-6.673605 3.490497 0.000000</point>
+<point>-6.365883 3.076123 0.000000</point>
+<point>-6.032473 2.682124 0.000000</point>
+<point>-5.674718 2.310088 0.000000</point>
+<point>-5.294065 1.961518 0.000000</point>
+<point>-4.892047 1.637820 0.000000</point>
+<point>-4.470289 1.340301 0.000000</point>
+<point>-4.030491 1.070160 0.000000</point>
+<point>-3.574428 0.828488 0.000000</point>
+<point>-3.103941 0.616260 0.000000</point>
+<point>-2.620929 0.434333 0.000000</point>
+<point>-2.127340 0.283441 0.000000</point>
+<point>-1.625167 0.164192 0.000000</point>
+<point>-1.116435 0.077069 0.000000</point>
+<point>-0.603198 0.022422 0.000000</point>
+<point>-0.087527 0.000471 0.000000</point>
+<point>0.428497 0.011307 0.000000</point>
+<point>0.942792 0.054884 0.000000</point>
+<point>1.453282 0.131028 0.000000</point>
+<point>1.957908 0.239430 0.000000</point>
+<point>2.454633 0.379653 0.000000</point>
+<point>2.941453 0.551132 0.000000</point>
+<point>3.416403 0.753174 0.000000</point>
+<point>3.877566 0.984964 0.000000</point>
+<point>4.323082 1.245568 0.000000</point>
+<point>4.751152 1.533932 0.000000</point>
+<point>5.160050 1.848894 0.000000</point>
+<point>5.548125 2.189182 0.000000</point>
+<point>5.913811 2.553424 0.000000</point>
+<point>6.255633 2.940149 0.000000</point>
+<point>6.572211 3.347797 0.000000</point>
+<point>6.862267 3.774723 0.000000</point>
+<point>7.124632 4.219203 0.000000</point>
+<point>7.358246 4.679446 0.000000</point>
+<point>7.562166 5.153592 0.000000</point>
+<point>7.735571 5.639729 0.000000</point>
+<point>7.877759 6.135895 0.000000</point>
+<point>7.988158 6.640088 0.000000</point>
+<point>8.066321 7.150273 0.000000</point>
+<point>8.111933 7.664392 0.000000</point>
+<point>8.124811 8.180369 0.000000</point>
+<material><script><uri>package://auto_rc_car_worlds/media/materials/scripts/our_road.material</uri><name>OurRoad</name></script><shader type='normal_map_tangent_space'><normal_map>road1.png</normal_map></shader></material></road>
+  </world>
+</sdf>

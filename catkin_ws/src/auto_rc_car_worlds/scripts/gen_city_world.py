@@ -60,5 +60,5 @@ if __name__ == "__main__":
             wb.add(contents, wb.generate_house_contents(3, 50, 20, 1.5707))
 
 
-    wb.write_dest(contents)
+        wb.write_dest(contents)
 

@@ -64,6 +64,7 @@ class GeneratorConfigSample:
 
         self.straight = self.sample_uni([0.0, 1.0]) < settings['prob_straight']
         self.inv_rad = self.sample_uni(settings['inv_radius'])
+        self.inv_rad = self.inv_rad * self.sample_uni([-1.0, 1.0])
 
         self.DY = self.sample_uni(settings['DY'])
         self.Segments = int(self.sample_uni(settings['Segments']))
@@ -94,6 +95,9 @@ class GeneratorConfigSample:
             'focal_length': self.FOCAL_LENGTH,
             'notes': self.notes
         }
+    
+    def is_valid(self):
+        return abs(self.X0 + self.YAW0) < 0.5
 
 class Generator:
     def __init__(self, settings, pkg_dir):
@@ -136,15 +140,20 @@ class Generator:
 
         self.settings['road_images'] = []
         for image_file in self.settings['road_image_files']:
-            self.settings['road_images'].append(cv2.imread(self.roads_dir + image_file, cv2.IMREAD_COLOR))
+            img = cv2.imread(self.roads_dir + image_file, cv2.IMREAD_COLOR)
+            self.settings['road_images'].append(img)
         self.settings['background_images'] = []
         for image_file in self.settings['background_image_files']:
-            self.settings['background_images'].append(cv2.imread(self.backgrounds_dir + image_file, cv2.IMREAD_COLOR))
+            img = cv2.imread(self.backgrounds_dir + image_file, cv2.IMREAD_COLOR)
+            img = cv2.resize(img, (WIDTH, HEIGHT), interpolation=cv2.INTER_AREA)
+            self.settings['background_images'].append(img)
 
     def run(self):
-        print("Generating %d Samples" % self.settings['N'])
         for i in range(0, self.settings['N']):
-            config = GeneratorConfigSample(self.settings)
+            print("Generating sample %d of %d" % (i+1, self.settings['N']))
+            config = None
+            while config is None or not config.is_valid():
+                config = GeneratorConfigSample(self.settings)
             self.generate_image(config)
 
         print("Saving Source Media")
@@ -153,6 +162,9 @@ class Generator:
 
         for name, image in zip(self.settings['background_image_files'], self.settings['background_images']):
             cv2.imwrite(self.out_media_roads + name, image)
+
+        with open(self.out_dir + "/gen_settings.yaml", 'w') as sett_file:
+            yaml.dump(self.settings, sett_file)
 
     def generate_image(self, config):
         segment = config.road_image
@@ -170,7 +182,6 @@ class Generator:
         dTheta = 0.0
         if not config.straight:
             dTheta = config.DY / (1.0 / config.inv_rad)
-            dTheta = dTheta * random.uniform(1.0, -1.0)
         else:
             config.inv_rad = 0.0
         

@@ -2,8 +2,8 @@
   <arg name="CAR_CONFIG" default="base_car_params.yaml"/>
   
   <arg name="blank" default="false"/>
-  <arg name="world_name" value="blank_lane_world.sdf" if="$(arg blank)"/>
-  <arg name="world_name" value="lane_world.sdf" unless="$(arg blank)"/>
+  <arg name="world_name" value="blank_concave_world.sdf" if="$(arg blank)"/>
+  <arg name="world_name" value="concave_world.sdf" unless="$(arg blank)"/>
 
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">

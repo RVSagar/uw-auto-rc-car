@@ -6,8 +6,8 @@ chassis_height: 0.05
 
 wheel_y_offset: 0.115
 wheel_z_offset: 0.0098
-front_wheel_x_offset: -0.1755
-rear_wheel_x_offset: 0.1845
+front_wheel_x_offset: 0.1755
+rear_wheel_x_offset: -0.1845
 
 chassis_mass: 3
 chassis_Ixx: 3

@@ -39,8 +39,10 @@ if __name__ == "__main__":
 
     t_start = rospy.Time.now()
     timeout = rospy.get_param("timeout", -1)
+    rate = rospy.Rate(20)
 
     while not rospy.is_shutdown():
+        rate.sleep()
         status_msg.time_up.data = rospy.Time.now() - t_start
         
         # Exit conditions
@@ -74,9 +76,13 @@ if __name__ == "__main__":
         
 
         grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        small = cv2.resize(grey, (80, 60))
+        small = cv2.resize(grey, (160, 120))
         X = np.array(small)
-        X = X.reshape([-1, 60, 80, 1])
+        X = X.reshape([-1, 120, 160, 1])
+        #cv2.imshow('image',small)
+        #cv2.waitKey(0)
+
+        X = (X/255.0 - 0.5)
         pred = model.predict(X)
         #print(pred)
         road_x0 = pred[0][0]
@@ -85,8 +91,8 @@ if __name__ == "__main__":
         print("Predict road: %.3f, %.3f, %.3f" % (road_x0, road_yaw0, road_invRad))
         
         ang_deg = 0.0
-        control_ang = 0*road_invRad + road_yaw0 - 0.1*road_x0
-
+        control_ang = road_x0 + road_invRad + road_yaw0
+        print(control_ang)
         # Slow down if turning
         steer_speed_scale = 1.0 / (0.5* control_ang*control_ang + 1.0)
 

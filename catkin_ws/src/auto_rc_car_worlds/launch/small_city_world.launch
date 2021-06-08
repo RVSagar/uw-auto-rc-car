@@ -2,7 +2,7 @@
   <arg name="CAR_CONFIG" default="base_car_params.yaml"/>
 
   <arg name="blank" default="false"/>
-  <arg name="world_name" value="small_city_world.sdf" if="$(arg blank)"/>
+  <arg name="world_name" value="blank_small_city_world.sdf" if="$(arg blank)"/>
   <arg name="world_name" value="small_city_world.sdf" unless="$(arg blank)"/>
 
 
