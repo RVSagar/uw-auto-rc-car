@@ -9,6 +9,8 @@ import yaml
 import uuid
 import rospkg
 
+from auto_rc_car_demos.basic_camera import HandCodedLaneFollower
+
 HEIGHT = 480
 WIDTH = 640
 
@@ -110,6 +112,8 @@ class Generator:
         self.out_media_roads = self.out_dir + "source_media/roads/"
         self.out_media_backgrounds = self.out_dir + "source_media/backgrounds/"
 
+        self.lane_follower = HandCodedLaneFollower()
+
         print("Directory generation may produce error if dir exists, or for true errors")
         for directory in [self.out_dir, self.out_data_dir, self.out_info_dir, self.out_media_backgrounds, self.out_media_roads]: 
             try:
@@ -208,9 +212,14 @@ class Generator:
             road = cv2.add(road, new)
 
         sample_uuid = str(uuid.uuid4())
+        final_frame, final_steering_angle, ang_deg = self.lane_follower.follow_lane(road)
+        
         cv2.imwrite(self.out_data_dir + '/' + sample_uuid + '.png', road)
         with open(self.out_info_dir + "/" + sample_uuid + ".yaml", 'w') as file:
-            yaml.dump(config.gen_info_dict(), file)
+            dict_to_write = config.gen_info_dict()
+            dict_to_write['steering_angle'] = ang_deg
+            dict_to_write['steering_command'] = final_steering_angle
+            yaml.dump(dict_to_write, file)
 
     def pointToPixels(self, pos, config):
         # http://www.cse.psu.edu/~rtc12/CSE486/lecture12.pdf
