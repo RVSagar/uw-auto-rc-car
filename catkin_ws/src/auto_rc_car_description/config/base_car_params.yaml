@@ -10,12 +10,12 @@ front_wheel_x_offset: 0.1755
 rear_wheel_x_offset: -0.1845
 
 chassis_mass: 3
-chassis_Ixx: 3
+chassis_Ixx: 0.00485
 chassis_Ixy: 0
 chassis_Ixz: 0
-chassis_Iyy: 3
+chassis_Iyy: 0.040625
 chassis_Iyz: 0
-chassis_Izz: 3
+chassis_Izz: 0.044225
 
 motor_effort_limit: 0.9730
 drivetrain_radius_a: 0.01605
