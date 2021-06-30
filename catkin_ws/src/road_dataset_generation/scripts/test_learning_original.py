@@ -166,8 +166,8 @@ if __name__ == "__main__":
     X_val, Y_val, D_val = arrange_data(validation_set, "Validation")
     X_test, Y_test, D_test = arrange_data(test_set, "Test")
 
-    #es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
-    #mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
+    mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
 
     if os.path.exists(model_name) and settings['load_latest']:
         model = keras.models.load_model(model_name)
@@ -176,7 +176,6 @@ if __name__ == "__main__":
         X = X.reshape([-1, OUT_HEIGHT, OUT_WIDTH, 1])
         Y = Y_train[0]
         Yp = model.predict([X])
-        print("Test Network")
         print(Y)
         print(Yp)
         print(Y-Yp)
@@ -184,28 +183,24 @@ if __name__ == "__main__":
             exit()
     else:
         model = Sequential()
-        model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(OUT_HEIGHT,OUT_WIDTH,1)))
-        model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(MaxPooling2D((2,2)))
-        model.add(Dropout(0.2))
-        
-        model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(MaxPooling2D((2,2)))
-        model.add(Dropout(0.2))
-        
-        model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(MaxPooling2D((2,2)))
-        model.add(Dropout(0.2))
-        
+        model.add(Conv2D(16, (5, 5), input_shape=(OUT_HEIGHT,OUT_WIDTH,1)))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(Conv2D(32, (5, 5)))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(MaxPooling2D((2, 2)))
+        model.add(Conv2D(32, (5, 5)))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(MaxPooling2D((2, 2)))
         model.add(Flatten())
-        model.add(Dense(128, activation='relu', kernel_initializer='he_uniform'))
-        model.add(Dropout(0.2))
-        model.add(Dense(3, activation='softmax'))
-        
+        model.add(Dense(100))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.4))
+        model.add(Dense(3, activation=None))
         # compile model
-        opt = SGD(lr=0.001, momentum=0.9)
+        opt = SGD(lr=0.01, momentum=0.9, clipnorm=1)
         model.compile(optimizer=opt, loss='mse', metrics=['mse'])
 
     print(model.summary())
@@ -213,7 +208,7 @@ if __name__ == "__main__":
                         epochs=settings['epochs'],
                         batch_size=16,
                         validation_data=(X_val, Y_val),
-                        #callbacks=[es, mc],
+                        callbacks=[es, mc],
                         verbose=1)
                         
     _, acc = model.evaluate(X_test, Y_test, verbose = 1)

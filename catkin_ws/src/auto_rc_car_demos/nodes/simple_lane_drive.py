@@ -43,9 +43,9 @@ if __name__ == "__main__":
     print("Starting")
     dist = 0
 
-    threshold = 15
-    base_speed =6.5 #8.0
-    steer_speed_scale = 26.0 #20.0
+    threshold = 15 #15.0
+    base_speed = 8.0 #8.0
+    steer_speed_scale = 20.0 #20.0
 
     t_start = rospy.Time.now()
     timeout = rospy.get_param("timeout", -1)
