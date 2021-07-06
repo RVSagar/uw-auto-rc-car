@@ -1,5 +1,5 @@
 #wasteful, since it's not deriving from the base image, fix later, was complicated
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:11.2.0-cudnn8-devel-ubuntu18.04
 
 # setup sources.list
 RUN echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros1-latest.list

@@ -166,8 +166,8 @@ if __name__ == "__main__":
     X_val, Y_val, D_val = arrange_data(validation_set, "Validation")
     X_test, Y_test, D_test = arrange_data(test_set, "Test")
 
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
-    mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
+    #es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
+    #mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
 
     if os.path.exists(model_name) and settings['load_latest']:
         model = keras.models.load_model(model_name)
@@ -208,12 +208,12 @@ if __name__ == "__main__":
                         epochs=settings['epochs'],
                         batch_size=16,
                         validation_data=(X_val, Y_val),
-                        callbacks=[es, mc],
+                        #callbacks=[es, mc],
                         verbose=1)
                         
     _, acc = model.evaluate(X_test, Y_test, verbose = 1)
     print('>%.3f'%(acc*100.0))
     
-    #print(model.predict(X_train))
+    print(model.predict(X_train))
 
     #model.save(model_name)

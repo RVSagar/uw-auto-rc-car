@@ -23,6 +23,7 @@ from keras.layers import LeakyReLU
 from keras.layers import Dropout
 from keras.optimizers import SGD
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.preprocessing.image import ImageDataGenerator
 
 print(device_lib.list_local_devices())
 
@@ -184,31 +185,37 @@ if __name__ == "__main__":
             exit()
     else:
         model = Sequential()
-        model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(OUT_HEIGHT,OUT_WIDTH,1)))
-        model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(MaxPooling2D((2,2)))
+        
+        model.add(Conv2D(32, (5,5), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape= (OUT_HEIGHT,OUT_WIDTH,1), ))
+        model.add(Conv2D(32, (5,5), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(MaxPooling2D((2, 2)))
         model.add(Dropout(0.2))
         
-        model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(MaxPooling2D((2,2)))
-        model.add(Dropout(0.2))
+        model.add(Conv2D(64, (5,5), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(Conv2D(64, (3,5), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(MaxPooling2D((2, 2)))
+        model.add(Dropout(0.3))
         
-        model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(MaxPooling2D((2,2)))
-        model.add(Dropout(0.2))
+        model.add(Conv2D(128, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(Conv2D(128, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(MaxPooling2D((2, 2)))
+        model.add(Dropout(0.4))
         
         model.add(Flatten())
         model.add(Dense(128, activation='relu', kernel_initializer='he_uniform'))
-        model.add(Dropout(0.2))
+        model.add(Dropout(0.5))
         model.add(Dense(3, activation='softmax'))
+
         
         # compile model
         opt = SGD(lr=0.001, momentum=0.9)
         model.compile(optimizer=opt, loss='mse', metrics=['mse'])
 
     print(model.summary())
+    
+    #datagen = ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
+    #it_train = datagen.flow(X_train, Y_train, batch_size=16)
+    
     history = model.fit(X_train, Y_train,
                         epochs=settings['epochs'],
                         batch_size=16,
@@ -216,9 +223,11 @@ if __name__ == "__main__":
                         #callbacks=[es, mc],
                         verbose=1)
                         
+    #history = model.fit_generator(it_train, epochs=settings['epochs'], validation_data=(X_val, Y_val), verbose=1)
+                        
     _, acc = model.evaluate(X_test, Y_test, verbose = 1)
     print('>%.3f'%(acc*100.0))
     
-    #print(model.predict(X_train))
+    print(model.predict(X_test))
 
     #model.save(model_name)
