@@ -8,8 +8,8 @@ _SHOW_IMAGE = False
 #BLACK_MIN = np.array([0, 0, 0],np.uint8)
 #BLACK_MAX = np.array([180, 255, 90],np.uint8)
 sensitivity = 40
-lower_white = np.array([0,0,255-sensitivity])
-upper_white = np.array([255,sensitivity,255])
+lower_white = np.array([0,0,130-sensitivity])
+upper_white = np.array([179,sensitivity,165-sensitivity])
 
 WHITE_MIN = np.array(lower_white,np.uint8)
 WHITE_MAX = np.array(upper_white,np.uint8)

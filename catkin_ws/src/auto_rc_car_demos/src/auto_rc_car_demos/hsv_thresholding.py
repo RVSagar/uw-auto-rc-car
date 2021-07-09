@@ -3,12 +3,16 @@
 import cv2
 import sys
 import numpy as np
+import rospkg
 
 def nothing(x):
     pass
 
+rospack = rospkg.RosPack()
+package_dir = rospack.get_path("auto_rc_car_demos")
+
 # Load in image
-image = cv2.imread('road0.png')
+image = cv2.imread(package_dir + '/test_images/rviz_lane_image.png')
 
 # Create a window
 cv2.namedWindow('image')
