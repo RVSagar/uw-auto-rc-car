@@ -6,6 +6,9 @@ base:
 tf:
 	docker build -t uw_rc_car:latest -t uw_rc_car:tf -f docker/Dockerfile.Tensorflow .
 
+tf-cpu:
+	docker build -t uw_rc_car:latest -t uw_rc_car:tf -f docker/Dockerfile.Tensorflow.CPU .
+
 vnc: base
 	docker build -t uw_rc_car:latest -t uw_rc_car:vnc -f docker/Dockerfile.VNC .
 
