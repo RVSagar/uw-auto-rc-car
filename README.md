@@ -58,7 +58,7 @@ The easiest way to get up and running with the environment is Docker.
 0. `git clone https://github.com/RVSagar/uw-auto-rc-car.git`
 1. `cd uw-auto-rc-car`
 2. `git submodule update --init --recursive`
-3. docker pull ghcr.io/rvsagar/uw-auto-rc-car/uw_rc_car:tf-cpu (this will take a while, it'll download the latest tf-cpu image from the GitHub Container Registry)
+3. `docker pull ghcr.io/rvsagar/uw-auto-rc-car/uw_rc_car:tf-cpu` (this will take a while, it'll download the latest tf-cpu image from the GitHub Container Registry)
 4. Start the docker `./start_docker_no_nvidia.sh tf-cpu yes`
 5. You should now have a usable container with Tensorflow/Keras that will train on a CPU. ROS Melodic is also available in this image.
 
