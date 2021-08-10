@@ -11,8 +11,8 @@ import rospkg
 
 from auto_rc_car_demos.basic_camera import HandCodedLaneFollower
 
-HEIGHT = 480
-WIDTH = 640
+HEIGHT = 240
+WIDTH = 320
 
 '''
 Coordinates

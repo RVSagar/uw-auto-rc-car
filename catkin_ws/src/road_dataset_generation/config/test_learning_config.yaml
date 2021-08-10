@@ -1,5 +1,5 @@
 sub_dirs: ['test']
 model_name: 'test_model'
 load_latest: true
-epochs: 100
+epochs: 10
 train_existing: false

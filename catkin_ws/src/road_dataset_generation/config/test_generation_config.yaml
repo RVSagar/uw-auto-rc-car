@@ -1,7 +1,7 @@
 subdir: test # images and info get put in 'output/[subdir]'
 notes: "" # Extra note you want to add
 clear: True # Will remove existing files in subdir if True. Will prompt before deleting
-N: 150 # Number of images to generate
+N: 1000 # Number of images to generate
 road_image_files: # List of road image files to use
   - road0.png
   - road1.png
@@ -15,23 +15,23 @@ background_image_files: # List of background image files to use
   - sim_grass3.png
 
 # Road Start
-X0: [-0.7, 0.7] # Road will be offset left-right within this range
+X0: [0.24, 0.26] # Road will be offset left-right within this range
 Y0: [0, 0] # Road will be offset forward-backward within this range
-YAW0: [-0.4, 0.4] # Road will start with an initial angle (rad) within this range
+YAW0: [-0.23, -0.27] # Road will start with an initial angle (rad) within this range
 
 # Road Properties
-prob_straight: 0.2 # probability that the road will be straight
-inv_radius: [0.000001, 0.1] # Inverse of the radius of a curved road
-ROAD_WIDTH: [0.9, 1.1] # Width of the road
+prob_straight: 0.5 # probability that the road will be straight
+inv_radius: [0.1, 0.2] # Inverse of the radius of a curved road
+ROAD_WIDTH: [1.0, 1.0] # Width of the road
 
 # Other Properties
 DY: [0.2, 0.25] # Roads will be generated in segments of this width
 Segments: [100,110] # Roads will have this many segments
 
-# Camera Properties
+# Camera Properties Kinect Gazebo: http://cmp.felk.cvut.cz/ftp/articles/pajdla/Smisek-CDC4CV-2011.pdf
 CAM_HEIGHT: [0.29, 0.31] # Height of camera off of ground
-CAM_FOCAL_LENGTH: [0.00366, 0.00368] # Focal length of simulated camera
-CAM_PIXEL_SIZE: [0.00000397, 0.00000399] # Pixel size of simulated camera1
+CAM_FOCAL_LENGTH: [0.00899, 0.00901] # Focal length of simulated camera
+CAM_PIXEL_SIZE: [0.00000799, 0.00000801] # Pixel size of simulated camera1
 
 # C920 from: https://stackoverflow.com/questions/50544727/distance-to-object-webcam-c920hd-or-use-opencv-calibrate-py
 # FOCAL_LENGTH = 0.00367

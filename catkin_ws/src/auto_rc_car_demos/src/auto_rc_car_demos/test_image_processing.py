@@ -14,4 +14,4 @@ if __name__ == '__main__':
     rospack = rospkg.RosPack()
     package_dir = rospack.get_path("auto_rc_car_demos")
 
-    lane_follower.test_photo(package_dir + '/test_images/test6.png')
+    lane_follower.test_photo(package_dir + '/test_images/rviz_lane_image.png')

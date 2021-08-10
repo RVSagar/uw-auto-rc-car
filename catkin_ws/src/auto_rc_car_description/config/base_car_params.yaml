@@ -23,13 +23,13 @@ drivetrain_radius_b: 0.0413
 car_velocity_limit: 15
 
 wheel_radius: 0.06
-wheel_mass: 0.01
-wheel_Ixx: 0.0008
+wheel_mass: 1
+wheel_Ixx: 10
 wheel_Ixy: 0
 wheel_Ixy: 0
-wheel_Iyy: 0.00001
+wheel_Iyy: 1
 wheel_Iyz: 0
-wheel_Izz: 0.00001
+wheel_Izz: 1
 
 wheel_gaz_mu1: 10.0
 wheel_gaz_mu2: 10.0

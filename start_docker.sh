@@ -66,9 +66,9 @@ xhost +
 ADDITIONAL_FLAGS="--rm --interactive --tty"
 ADDITIONAL_FLAGS="$ADDITIONAL_FLAGS --device /dev/dri:/dev/dri --volume=/run/udev:/run/udev"
 
-IMAGE_NAME=uw_rc_car
+IMAGE_NAME=ghcr.io/rvsagar/uw-auto-rc-car/uw_rc_car
 TAG=$1
-CONTAINER_NAME=${IMAGE_NAME}_${USER}
+CONTAINER_NAME=uw_rc_car_${USER}
 
 echo Using container: $IMAGE_NAME:$TAG
 

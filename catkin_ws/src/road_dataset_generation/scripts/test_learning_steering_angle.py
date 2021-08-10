@@ -11,6 +11,8 @@ import rospkg
 import pickle as pk
 import sklearn.model_selection
 
+import matplotlib.pyplot as plt
+
 import tensorflow as tf
 from tensorflow.python.client import device_lib
 import keras.models
@@ -21,7 +23,7 @@ from keras.layers import Dense
 from keras.layers import Flatten
 from keras.layers import LeakyReLU
 from keras.layers import Dropout
-from keras.optimizers import SGD
+from keras.optimizers import SGD, Adam
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 print(device_lib.list_local_devices())
@@ -42,7 +44,7 @@ def arrange_data(dataset, name):
     X = X.reshape([-1,OUT_HEIGHT,OUT_WIDTH,1])
 
     Y = np.array(Y)
-    Y = Y.reshape([-1, 3])
+    Y = Y.reshape([-1, 1])
     print("  X: " + str(X.shape))
     print("  Y: " + str(Y.shape))
     return X, Y, D
@@ -60,9 +62,17 @@ def preprocess_data(X, D):
     small = small/255.0 - 0.5
     
 
-    Y = np.array([[D['X0']],
-                  [D['YAW0']],
-                  [D['inv_rad']]])
+    # Y = np.array([[D['X0']],
+    #               [D['YAW0']],
+    #               [D['inv_rad']]])
+
+    Y = np.array([
+                    # [D['X0']],
+                    # [D['YAW0']],
+                    # [D['inv_rad']],
+                    [D['steering_command']]
+                  
+                 ])
     
     return (small, Y, D)
 
@@ -96,6 +106,7 @@ def load_dataset(pkg_dir, settings, sub_dir):
     dataset = []
 
     info_files = os.listdir(info_dir)
+    
     i = 0
     for f in info_files:
         i = i + 1
@@ -116,7 +127,7 @@ def load_dataset(pkg_dir, settings, sub_dir):
         #cv2.imshow('orig', orig_sample[0] + 0.5)
         #cv2.waitKey(0)
 
-        for flip in [False, True]:
+        for flip in [False, False]:
             for intensity in [1.0, 0.75, 0.5]:
                 sample = orig_sample
 
@@ -128,9 +139,9 @@ def load_dataset(pkg_dir, settings, sub_dir):
                 sample = (intensity * (sample[0] + 0.5) - 0.5, sample[1], sample[2])
                 
                 dataset.append(sample)
-                #cv2.imshow('image - %s - %s' % (str(flip), str(intensity)),sample[0] + 0.5)
-                #print(sample[1])
-                #cv2.waitKey(0)
+                # cv2.imshow('image - %s - %s' % (str(flip), str(intensity)),sample[0] + 0.5)
+                # print(sample[1])
+                # cv2.waitKey(0)
 
     print("Saving dataset to %s" % dataset_pickle)
     with open(dataset_pickle, 'w') as file:
@@ -146,6 +157,107 @@ def load_datasets(pkg_dir, settings):
 
     return dataset
 
+def nvidiaBaseModel():
+    model = Sequential()
+    
+    model.add(Conv2D(3, (5,5), strides=(2,2), input_shape= (OUT_HEIGHT,OUT_WIDTH,1), activation='elu'))
+    
+    model.add(Conv2D(24, (5,5), strides=(2,2), activation='elu'))
+    
+    model.add(Conv2D(36, (5,5), strides=(2,2), activation='elu'))
+    
+    model.add(Conv2D(48, (3,3), strides=(2,2), activation='elu'))
+    
+    model.add(Conv2D(64, (3,3), strides=(2,2), activation='elu'))
+    
+    model.add(Flatten())
+    
+    model.add(Dense(1164, activation='elu'))
+    model.add(Dense(100, activation='elu'))
+    model.add(Dense(50, activation='elu'))
+    model.add(Dense(10, activation='elu'))
+    
+    model.add(Dense(1))
+    
+    optimizer = Adam(learning_rate=1e-5)
+    model.compile(loss='mse', optimizer=optimizer, metrics=['mse', rmse, r_square])
+    
+    print(model)
+    return model
+
+# root mean squared error (rmse) for regression
+def rmse(y_true, y_pred):
+    from keras import backend
+    return backend.sqrt(backend.mean(backend.square(y_pred - y_true), axis=-1))
+
+# coefficient of determination (R^2) for regression
+def r_square(y_true, y_pred):
+    from keras import backend as K
+    SS_res =  K.sum(K.square(y_true - y_pred)) 
+    SS_tot = K.sum(K.square(y_true - K.mean(y_true))) 
+    return (1 - SS_res/(SS_tot + K.epsilon()))
+
+def plot_results(result, y_test, y_pred):
+    #https://github.com/keras-team/keras/issues/7947
+    #-----------------------------------------------------------------------------
+    # Plot learning curves including R^2 and RMSE
+    #-----------------------------------------------------------------------------
+
+    # plot training curve for R^2 (beware of scale, starts very low negative)
+    plt.plot(result.history['val_r_square'])
+    plt.plot(result.history['r_square'])
+    plt.title('model R^2')
+    plt.ylabel('R^2')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+            
+    # plot training curve for rmse
+    plt.plot(result.history['rmse'])
+    plt.plot(result.history['val_rmse'])
+    plt.title('rmse')
+    plt.ylabel('rmse')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
+
+    plt.plot(result.history['loss'],color='blue')
+    plt.plot(result.history['val_loss'],color='red')
+    plt.title('loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(["training loss", "validation loss"])
+    plt.show()
+
+    # print the linear regression and display datapoints
+    from sklearn.linear_model import LinearRegression  
+    regressor = LinearRegression()  
+    regressor.fit(y_test.reshape(-1,1), y_pred)  
+    y_fit = regressor.predict(y_pred) 
+
+    reg_intercept = round(regressor.intercept_[0],4)
+    reg_coef = round(regressor.coef_.flatten()[0],4)
+    reg_label = "y = " + str(reg_intercept) + "*x +" + str(reg_coef)
+
+    plt.scatter(y_test, y_pred, color='blue', label= 'data')
+    plt.plot(y_pred, y_fit, color='red', linewidth=2, label = 'Linear regression\n'+reg_label) 
+    plt.title('Linear Regression')
+    plt.legend()
+    plt.xlabel('observed')
+    plt.ylabel('predicted')
+    plt.show()
+
+    #-----------------------------------------------------------------------------
+    # print statistical figures of merit
+    #-----------------------------------------------------------------------------
+
+    import sklearn.metrics, math
+    print("\n")
+    print("Mean absolute error (MAE):      %f" % sklearn.metrics.mean_absolute_error(y_test,y_pred))
+    print("Mean squared error (MSE):       %f" % sklearn.metrics.mean_squared_error(y_test,y_pred))
+    print("Root mean squared error (RMSE): %f" % math.sqrt(sklearn.metrics.mean_squared_error(y_test,y_pred)))
+    print("R square (R^2):                 %f" % sklearn.metrics.r2_score(y_test,y_pred))
 
 if __name__ == "__main__":
     rospack = rospkg.RosPack()
@@ -170,11 +282,12 @@ if __name__ == "__main__":
     mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
 
     if os.path.exists(model_name) and settings['load_latest']:
-        model = keras.models.load_model(model_name)
+        model = keras.models.load_model(model_name, custom_objects={"rmse": rmse, "r_square": r_square})
 
-        X = X_train[0]
+        sample_to_test = 2
+        X = X_train[sample_to_test]
         X = X.reshape([-1, OUT_HEIGHT, OUT_WIDTH, 1])
-        Y = Y_train[0]
+        Y = Y_train[sample_to_test]
         Yp = model.predict([X])
         print("Test Network")
         print(Y)
@@ -183,34 +296,19 @@ if __name__ == "__main__":
         if not settings['train_existing']:
             exit()
     else:
-        model = Sequential()
-        model.add(Conv2D(16, (5, 5), input_shape=(OUT_HEIGHT,OUT_WIDTH,1)))
-        model.add(LeakyReLU(alpha=0.3))
-        model.add(Dropout(0.4))
-        model.add(Conv2D(32, (5, 5)))
-        model.add(LeakyReLU(alpha=0.3))
-        model.add(Dropout(0.4))
-        model.add(MaxPooling2D((2, 2)))
-        model.add(Conv2D(32, (5, 5)))
-        model.add(LeakyReLU(alpha=0.3))
-        model.add(Dropout(0.4))
-        model.add(MaxPooling2D((2, 2)))
-        model.add(Flatten())
-        model.add(Dense(100))
-        model.add(LeakyReLU(alpha=0.3))
-        model.add(Dropout(0.4))
-        model.add(Dense(3, activation=None))
-        # compile model
-        opt = SGD(lr=0.01, momentum=0.9, clipnorm=1)
-        model.compile(optimizer=opt, loss='mse', metrics=['mse'])
+        model = nvidiaBaseModel()
 
     print(model.summary())
     history = model.fit(X_train, Y_train,
                         epochs=settings['epochs'],
-                        batch_size=16,
+                        batch_size=8,
                         validation_data=(X_val, Y_val),
                         callbacks=[es, mc],
                         verbose=1)
+    
+    y_predictions = model.predict(X_test)
+
+    plot_results(history, Y_test, y_predictions)
     #print(model.predict(X_train))
 
     #model.save(model_name)
