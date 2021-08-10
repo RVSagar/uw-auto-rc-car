@@ -69,11 +69,17 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnvinfer6=6.0.1-1+cuda10.1 \
     libnvinfer-dev=6.0.1-1+cuda10.1 \
+    python-tk \
     libnvinfer-plugin6=6.0.1-1+cuda10.1 && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
   hash -r pip && \
-  pip install wheel tensorflow keras==2.3.1 scikit-learn
+  pip install wheel imgaug --no-dependencies 
+
+RUN pip install scikit-learn pandas scikit-image
+
+RUN pip install wheel tensorflow keras==2.3.1 
+
 
 # setup bash ROS runtime
 COPY ./docker/.bashrc /root/

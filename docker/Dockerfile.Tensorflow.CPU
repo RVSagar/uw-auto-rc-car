@@ -62,11 +62,16 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ros-melodic-rgbd-launch ros-melodic-libuvc ros-melodic-libuvc-camera \
     ros-melodic-libuvc-ros bash-completion ros-melodic-rosserial \
+    python-tk \
     ros-melodic-rosserial-arduino && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
   hash -r pip && \
-  pip install wheel tensorflow keras==2.3.1 scikit-learn
+  pip install wheel imgaug --no-dependencies 
+
+RUN pip install scikit-learn pandas scikit-image
+
+RUN pip install wheel tensorflow keras==2.3.1 
 
 # setup bash ROS runtime
 COPY ./docker/.bashrc /root/
