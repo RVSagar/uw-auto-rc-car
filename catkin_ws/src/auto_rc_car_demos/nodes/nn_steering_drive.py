@@ -1,10 +1,12 @@
 #!/usr/bin/env python2
 import rospy
-import rospkg
 import numpy as np
 import cv2
 import math
-import datetime
+import rospkg
+
+import keras.models
+
 from auto_rc_car_api.client_factory import ClientGenerator
 
 from auto_rc_car_demos.basic_camera import BasicCameraCalc, HandCodedLaneFollower
@@ -12,15 +14,16 @@ from auto_rc_car_demos.lidar_calc import LidarCalc
 
 from auto_rc_car_msgs.msg import SimpleLaneFollowStatus
 
-FOURCC = cv2.VideoWriter_fourcc(*'XVID')
-RECORD = False
+from auto_rc_car_demos.test_training import img_preprocess
 
-def create_video_recorder(path, width, height):
-    return cv2.VideoWriter(path, FOURCC, 20.0, (width, height))
+
 
 if __name__ == "__main__":
+    rospack = rospkg.RosPack()
+
     car = ClientGenerator.CreateRCCarClient(rospy.get_param("client_context_type"),
                                             rospy.get_param("client_comm_type"))
+    model = keras.models.load_model(rospack.get_path("auto_rc_car_demos") + "/output_model/lane_navigation_final.h5")
 
     basic_cam_calc = BasicCameraCalc()
     lidar_calc = LidarCalc()
@@ -29,28 +32,19 @@ if __name__ == "__main__":
     status_msg = SimpleLaneFollowStatus()
     status_pub = rospy.Publisher("/status", SimpleLaneFollowStatus, queue_size=3)
 
-    rospack = rospkg.RosPack()
-    package_dir = rospack.get_path("auto_rc_car_demos")
-    video_filepath = package_dir + "/training_data/video"
-
-    img, dt = car.get_latest_camera_rgb()
-    img = car.camera_to_cv_image(img)
-    height, width, _ = img.shape
-
-    datestr = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-    video_orig = create_video_recorder(video_filepath + '/car_video%s.avi' % datestr, width, height)
-
     print("Starting")
     dist = 0
 
     threshold = 15
-    base_speed =6.5 #8.0
+    base_speed = 8.0 #8.0
     steer_speed_scale = 26.0 #20.0
 
     t_start = rospy.Time.now()
     timeout = rospy.get_param("timeout", -1)
+    rate = rospy.Rate(20)
 
     while not rospy.is_shutdown():
+        rate.sleep()
         status_msg.time_up.data = rospy.Time.now() - t_start
         
         # Exit conditions
@@ -81,24 +75,21 @@ if __name__ == "__main__":
         newX = int(img_size[1]*img_scale)
         newY = int(img_size[0]*img_scale)
         img_red = cv2.resize(img, (newX, newY))
-        #img_red = img
 
-        #cv2.imshow("Image reduced", img_red)
 
-        # Get centroid of black pixels, use for steering
-        centroid_x = basic_cam_calc.get_black_centroid(img_red, scaled_by=img_scale)
-        centroid_percentage = (centroid_x / float(cols) - 0.5) * 2.0
-        control_ang = -centroid_percentage * 0.25
-
-        # OR
-
-        if RECORD:
-            video_orig.write(img)
-
-        final_frame , control_ang, ang_deg = lane_follower.follow_lane(img)
-
+        X = img_preprocess(img)
+        X = np.asarray([X])
+        predicted_steering_angle = model.predict(X)[0]
+        print("Predict Steering: %.3f" % (predicted_steering_angle))
+        
+        ang_deg = predicted_steering_angle
+        control_ang = lane_follower.convert_to_api_steer(ang_deg)
+        print(control_ang)
         # Slow down if turning
         steer_speed_scale = 1.0 / (0.5* control_ang*control_ang + 1.0)
+
+        curr_heading_image = lane_follower.display_heading_line(img, predicted_steering_angle)
+        lane_follower.show_image("heading", curr_heading_image)
 
         status_msg.control_ang = control_ang
         status_msg.steer_ang_deg = ang_deg
@@ -183,7 +174,6 @@ if __name__ == "__main__":
     def shutdown():
         print ("shutdown time!")
         # Extra brake at end
-        video_orig.release()
         car.brake()
         car.send_control(0, 0)
 

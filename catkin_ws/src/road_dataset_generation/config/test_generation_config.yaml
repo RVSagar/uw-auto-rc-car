@@ -1,10 +1,10 @@
 subdir: test # images and info get put in 'output/[subdir]'
 notes: "" # Extra note you want to add
 clear: True # Will remove existing files in subdir if True. Will prompt before deleting
-N: 2500 # Number of images to generate
+N: 150 # Number of images to generate
 road_image_files: # List of road image files to use
-  - road0-1lane.png
-  - road1-1lane.png
+  - road0.png
+  - road1.png
 background_image_files: # List of background image files to use
   - background0.png
   - background1.png

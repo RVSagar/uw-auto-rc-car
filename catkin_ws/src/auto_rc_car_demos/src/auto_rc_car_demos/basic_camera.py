@@ -4,12 +4,15 @@ import numpy as np
 import logging
 
 
-_SHOW_IMAGE = False
+_SHOW_IMAGE = True
 #BLACK_MIN = np.array([0, 0, 0],np.uint8)
 #BLACK_MAX = np.array([180, 255, 90],np.uint8)
 sensitivity = 40
-lower_white = np.array([0,0,255-sensitivity])
-upper_white = np.array([255,sensitivity,255])
+lower_white = np.array([0,0,130-sensitivity])
+upper_white = np.array([179,sensitivity,165-sensitivity])
+
+# lower_white = np.array([0,0,120-sensitivity])
+# upper_white = np.array([179,sensitivity,160])
 
 WHITE_MIN = np.array(lower_white,np.uint8)
 WHITE_MAX = np.array(upper_white,np.uint8)
@@ -106,24 +109,54 @@ class HandCodedLaneFollower():
         edges = cv2.Canny(mask, 200, 400)
 
         return edges
-    
 
-    def region_of_interest(self, canny):
-        height, width = canny.shape
-        mask = np.zeros_like(canny)
+    # def region_of_interest(self, canny):
+    #     height, width = canny.shape
+    #     mask = np.zeros_like(canny)
 
-        # only focus bottom ROI of the screen
+    #     # only focus bottom ROI of the screen
 
-        polygon = np.array([[
-            (0, height * ROI),
-            (width, height * ROI),
-            (width, height),
-            (0, height),
-        ]], np.int32)
+    #     polygon = np.array([[
+    #         (0, height * ROI),
+    #         (width, height * ROI),
+    #         (width, height),
+    #         (0, height),
+    #     ]], np.int32)
 
-        cv2.fillPoly(mask, polygon, 255)
-        #self.show_image("mask", mask)
-        masked_image = cv2.bitwise_and(canny, mask)
+    #     cv2.fillPoly(mask, polygon, 255)
+    #     #self.show_image("mask", mask)
+    #     masked_image = cv2.bitwise_and(canny, mask)
+    #     return masked_image
+
+    def region_of_interest(self, img):
+        """
+        Applies an image mask.
+        
+        Only keeps the region of the image defined by the polygon
+        formed from `vertices`. The rest of the image is set to black.
+        `vertices` should be a numpy array of integer points.
+
+        https://github.com/OanaGaskey/Lane-Lines-Detection/blob/master/finding_lane_lines.ipynb
+        """
+        
+        height, width = img.shape
+        vertices = np.array([[(0,height),(4*width/9, 7*height/10), (5*width/9, 7*height/10), (width,height)]], dtype=np.int32)
+
+        #defining a blank mask to start with
+        mask = np.zeros_like(img)   
+        
+        #defining a 3 channel or 1 channel color to fill the mask with depending on the input image
+        if len(img.shape) > 2:
+            channel_count = img.shape[2]  # i.e. 3 or 4 depending on your image
+            ignore_mask_color = (255,) * channel_count
+        else:
+            ignore_mask_color = 255
+            
+        #filling pixels inside the polygon defined by "vertices" with the fill color    
+        cv2.fillPoly(mask, vertices, ignore_mask_color)
+        
+        #returning the image only where mask pixels are nonzero
+        masked_image = cv2.bitwise_and(img, mask)
         return masked_image
     
     def detect_line_segments(self, cropped_edges):

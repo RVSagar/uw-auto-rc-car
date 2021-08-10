@@ -8,6 +8,9 @@ export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/${USER}/catkin_ws/src/au
 export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/${USER}/catkin_ws/src/auto_rc_car_worlds/media
 export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/home/${USER}/catkin_ws/src/auto_rc_car_worlds/media/materials
 
+#not sure if there are any repercussions, but this helped fix cudnn errors
+export TF_FORCE_GPU_ALLOW_GROWTH='true'
+
 alias ls="ls --color=auto"
 alias grep="grep --color=auto"
 . /usr/share/bash-completion/bash_completion

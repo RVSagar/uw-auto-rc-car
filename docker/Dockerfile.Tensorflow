@@ -1,44 +1,81 @@
-FROM uw_rc_car:base
+#wasteful, since it's not deriving from the base image, fix later, was complicated
+FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 
-# virtualgl installation
-# RUN wget https://sourceforge.net/projects/virtualgl/files/2.6.4/virtualgl_2.6.4_amd64.deb && \
-#     apt-get update && \
-#     apt-get install -y --no-install-recommends libxtst6 && \
-#     dpkg -i virtualgl_2.6.4_amd64.deb
+# setup sources.list
+RUN echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros1-latest.list
 
-# cuda installation
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub && \
-    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-10-0_10.0.130-1_amd64.deb && \
-    apt-get install ./cuda-10-0_10.0.130-1_amd64.deb && \
-    wget http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb && \
-    apt-get install ./nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb && \
-    apt-get update && \
+# setup keys
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+
+# setup environment
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+ENV ROS_DISTRO melodic
+
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="America/Toronto" apt-get install -y tzdata
+
+# install ros packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-melodic-desktop-full=1.4.1-0* \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install basic useful programs
+# Some are just for testing that the docker image was built correctly
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    cuda-10-0 \
-    libcudnn7=7.6.5.32-1+cuda10.0 \
-    libcudnn7-dev=7.6.5.32-1+cuda10.0 && \
-    apt-get install -y --no-install-recommends \
-    libnvinfer6=6.0.1-1+cuda10.0 \
-    libnvinfer-dev=6.0.1-1+cuda10.0 \
-    libnvinfer-plugin6=6.0.1-1+cuda10.0 && \
+      curl \
+      wget \
+      build-essential \
+      cmake \
+      software-properties-common \
+      apt-transport-https \
+      psmisc \
+      vim \
+      gedit \
+      sudo \
+      python-pip \
+      net-tools\
+      dnsutils\
+      iputils-ping\
+      git-all && \
     rm -rf /var/lib/apt/lists/*
 
-# tensorflow installation
-RUN python -m pip install pip -U && \
-    python -m pip install setuptools pyasn1 -U && \
-    python -m pip install tensorflow
+# Install Required ROS Packages and Tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      python-catkin-tools \
+      ros-melodic-gazebo-ros-pkgs \
+      ros-melodic-gazebo-ros-control \
+      ros-melodic-joint-state-controller \
+      ros-melodic-teleop-twist-keyboard \
+      ros-melodic-effort-controllers \
+      ros-melodic-position-controllers \
+      ros-melodic-message-to-tf \
+      ros-melodic-rplidar-ros \
+      ros-melodic-serial \ 
+      ros-melodic-ackermann-msgs \
+      ros-melodic-rviz && \
+    rm -rf /var/lib/apt/lists/*
 
-# install the frame buffer, DE, and VNC server
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends \
-#     xvfb xfce4 xfce4-goodies x11vnc && \
-#     rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ros-melodic-rgbd-launch ros-melodic-libuvc ros-melodic-libuvc-camera \
+    ros-melodic-libuvc-ros bash-completion ros-melodic-rosserial \
+    ros-melodic-rosserial-arduino && rm -rf /var/lib/apt/lists/*
 
-# TODO: finish up the virtualgl + turbo setup
 
-# start FB, DE, and VNC
-# COPY ./docker/entrypoint.sh /
-# RUN chmod +x /entrypoint.sh
-# ADD ./.bashrc ~/.bashrc
-# CMD ["/entrypoint.sh"]
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libnvinfer6=6.0.1-1+cuda10.1 \
+    libnvinfer-dev=6.0.1-1+cuda10.1 \
+    libnvinfer-plugin6=6.0.1-1+cuda10.1 && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip && \
+  hash -r pip && \
+  pip install wheel tensorflow keras==2.3.1 scikit-learn
+
+# setup bash ROS runtime
+COPY ./docker/.bashrc /root/
+
+CMD ["bash"]
