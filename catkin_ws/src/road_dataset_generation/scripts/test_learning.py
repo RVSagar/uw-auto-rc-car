@@ -11,6 +11,8 @@ import rospkg
 import pickle as pk
 import sklearn.model_selection
 
+from matplotlib import pyplot
+
 import tensorflow as tf
 from tensorflow.python.client import device_lib
 import keras.models
@@ -24,6 +26,7 @@ from keras.layers import Dropout
 from keras.optimizers import SGD
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
+from keras.regularizers import l2
 
 print(device_lib.list_local_devices())
 
@@ -31,6 +34,8 @@ PREPROCESS_VERSION = 5
 
 OUT_HEIGHT=120
 OUT_WIDTH=160
+
+ROI = 0.5
 
 def arrange_data(dataset, name):
     print("Arranging: %s" % name)
@@ -48,6 +53,23 @@ def arrange_data(dataset, name):
     print("  Y: " + str(Y.shape))
     return X, Y, D
 
+def region_of_interest(canny):
+        height, width = canny.shape
+        mask = np.zeros_like(canny)
+
+        # only focus bottom ROI of the screen
+
+        polygon = np.array([[
+            (0, height * ROI),
+            (width, height * ROI),
+            (width, height),
+            (0, height),
+        ]], np.int32)
+
+        cv2.fillPoly(mask, polygon, 255)
+        #self.show_image("mask", mask)
+        masked_image = cv2.bitwise_and(canny, mask)
+        return masked_image
 
 def preprocess_data(X, D):
     grey = cv2.cvtColor(X, cv2.COLOR_BGR2GRAY)
@@ -57,15 +79,17 @@ def preprocess_data(X, D):
     small = cv2.resize(grey, (OUT_WIDTH, OUT_HEIGHT))
     #cv2.imshow('image',small)
     #cv2.waitKey(0)
+    
+    cropped_small = region_of_interest(small)
 
-    small = small/255.0 - 0.5
+    cropped_small = cropped_small/255.0 - 0.5
     
 
     Y = np.array([[D['X0']],
                   [D['YAW0']],
                   [D['inv_rad']]])
     
-    return (small, Y, D)
+    return (cropped_small, Y, D)
 
 def load_dataset(pkg_dir, settings, sub_dir):
     dataset_dir = pkg_dir + "/output/" + sub_dir + "/"
@@ -73,7 +97,7 @@ def load_dataset(pkg_dir, settings, sub_dir):
     info_dir = dataset_dir + "info/"
 
     with open(dataset_dir + "/gen_settings.yaml", 'r') as sett_file:
-        gen_sett = yaml.load(sett_file)
+        gen_sett = yaml.load(sett_file, Loader=yaml.Loader)
 
     def make_hash(obj):
         if isinstance(obj, (set, tuple, list)):
@@ -90,7 +114,7 @@ def load_dataset(pkg_dir, settings, sub_dir):
     dataset_pickle = dataset_dir + str(dataset_hash) + ".pk"
     if os.path.exists(dataset_pickle):
         print("Loading existing dataset: " + sub_dir)
-        with open(dataset_pickle, 'r') as file:
+        with open(dataset_pickle, 'rb') as file:
             return pk.load(file)
     print("Loading dataset from files in: " + sub_dir)
 
@@ -134,7 +158,7 @@ def load_dataset(pkg_dir, settings, sub_dir):
                 #cv2.waitKey(0)
 
     print("Saving dataset to %s" % dataset_pickle)
-    with open(dataset_pickle, 'w') as file:
+    with open(dataset_pickle, 'wb') as file:
         pk.dump(dataset, file)
     return dataset
 
@@ -147,10 +171,30 @@ def load_datasets(pkg_dir, settings):
 
     return dataset
 
+# plot diagnostic learning curves
+def summarize_diagnostics(history):
+    # plot loss
+    pyplot.subplot(211)
+    pyplot.title('Cross Entropy Loss')
+    pyplot.plot(history.history['loss'], color='blue', label='train')
+    pyplot.plot(history.history['val_loss'], color='orange', label='test')
+    # plot accuracy
+    pyplot.subplot(212)
+    pyplot.title('Classification Accuracy')
+    pyplot.plot(history.history['mse'], color='blue', label='train')
+    pyplot.plot(history.history['val_mse'], color='orange', label='test')
+    pyplot.close()
+    pyplot.show
+
+    
 
 if __name__ == "__main__":
-    rospack = rospkg.RosPack()
-    package_dir = rospack.get_path("road_dataset_generation")
+    #rospack = rospkg.RosPack()
+    #package_dir = rospack.get_path("road_dataset_generation")
+    
+    package_dir = r"C:/Users/Liam/catkin_ws/src/road_dataset_generation"
+    
+    assert os.path.isdir("C:/Users/Liam/catkin_ws/src/road_dataset_generation")
 
     with open(package_dir + "/config/test_learning_config.yaml", 'r') as file:
             settings = yaml.load(file, Loader=yaml.SafeLoader)
@@ -166,9 +210,11 @@ if __name__ == "__main__":
     X_train, Y_train, D_train = arrange_data(train_set, "Training")
     X_val, Y_val, D_val = arrange_data(validation_set, "Validation")
     X_test, Y_test, D_test = arrange_data(test_set, "Test")
+    
 
-    #es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
-    #mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
+
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
+    mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose=1)
 
     if os.path.exists(model_name) and settings['load_latest']:
         model = keras.models.load_model(model_name)
@@ -184,50 +230,62 @@ if __name__ == "__main__":
         if not settings['train_existing']:
             exit()
     else:
+
         model = Sequential()
         
-        model.add(Conv2D(32, (5,5), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape= (OUT_HEIGHT,OUT_WIDTH,1), ))
-        model.add(Conv2D(32, (5,5), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(Conv2D(16, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same', kernel_regularizer=l2(0.001), input_shape= (OUT_HEIGHT,OUT_WIDTH,1)))
+        model.add(Conv2D(16, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same', kernel_regularizer=l2(0.001)))
         model.add(MaxPooling2D((2, 2)))
+        model.add(LeakyReLU(alpha=0.3))
         model.add(Dropout(0.2))
         
-        model.add(Conv2D(64, (5,5), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(Conv2D(64, (3,5), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(Conv2D(32, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same', kernel_regularizer=l2(0.001)))
+        model.add(Conv2D(32, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same', kernel_regularizer=l2(0.001)))
         model.add(MaxPooling2D((2, 2)))
-        model.add(Dropout(0.3))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.2))
         
-        model.add(Conv2D(128, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-        model.add(Conv2D(128, (3,3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+        model.add(Conv2D(64, (2,2), activation='relu', kernel_initializer='he_uniform', padding='same', kernel_regularizer=l2(0.001)))
+        model.add(Conv2D(64, (2,2), activation='relu', kernel_initializer='he_uniform', padding='same', kernel_regularizer=l2(0.001)))
         model.add(MaxPooling2D((2, 2)))
-        model.add(Dropout(0.4))
+        model.add(LeakyReLU(alpha=0.3))
+        model.add(Dropout(0.2))
         
         model.add(Flatten())
-        model.add(Dense(128, activation='relu', kernel_initializer='he_uniform'))
-        model.add(Dropout(0.5))
-        model.add(Dense(3, activation='softmax'))
-
+        model.add(Dense(1164, activation='relu', kernel_initializer='he_uniform'))
+        model.add(Dense(100))
+        model.add(Dense(50))
+        model.add(Dense(10))
         
+        model.add(Dense(1))
         # compile model
-        opt = SGD(lr=0.001, momentum=0.9)
+        opt = SGD(learning_rate=1e-5, momentum=0.9, clipnorm=1)
         model.compile(optimizer=opt, loss='mse', metrics=['mse'])
+
 
     print(model.summary())
     
-    #datagen = ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
-    #it_train = datagen.flow(X_train, Y_train, batch_size=16)
+    datagen = ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
+    it_train = datagen.flow(X_train, Y_train, batch_size=16)
     
-    history = model.fit(X_train, Y_train,
-                        epochs=settings['epochs'],
-                        batch_size=16,
-                        validation_data=(X_val, Y_val),
+    #history = model.fit(X_train, Y_train,
+                        #epochs=settings['epochs'],
+                        #batch_size=16,
+                        #validation_data=(X_val, Y_val),
                         #callbacks=[es, mc],
-                        verbose=1)
+                       # verbose=1)
                         
-    #history = model.fit_generator(it_train, epochs=settings['epochs'], validation_data=(X_val, Y_val), verbose=1)
+    history = model.fit(it_train,
+                        epochs=settings['epochs'],
+                        validation_data=(X_val, Y_val),
+                        callbacks=[es, mc] ,
+                        verbose=1)
                         
     _, acc = model.evaluate(X_test, Y_test, verbose = 1)
     print('>%.3f'%(acc*100.0))
     
+    summarize_diagnostics(history)
+    
     print(model.predict(X_test))
 
-    #model.save(model_name)
+    #model.save("cifar_model.h5")
