@@ -163,19 +163,23 @@ def nvidiaBaseModel():
     model.add(Conv2D(3, (5,5), strides=(2,2), input_shape= (OUT_HEIGHT,OUT_WIDTH,1), activation='elu'))
     
     model.add(Conv2D(24, (5,5), strides=(2,2), activation='elu'))
+    model.add(Dropout(0.2))
     
     model.add(Conv2D(36, (5,5), strides=(2,2), activation='elu'))
     
     model.add(Conv2D(48, (3,3), strides=(2,2), activation='elu'))
+    model.add(Dropout(0.3))
     
     model.add(Conv2D(64, (3,3), strides=(2,2), activation='elu'))
     
     model.add(Flatten())
+    model.add(Dropout(0.4))
     
     model.add(Dense(1164, activation='elu'))
     model.add(Dense(100, activation='elu'))
     model.add(Dense(50, activation='elu'))
     model.add(Dense(10, activation='elu'))
+    model.add(Dropout(0.5))
     
     model.add(Dense(1))
     
