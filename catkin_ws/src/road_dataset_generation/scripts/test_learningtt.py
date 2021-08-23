@@ -176,7 +176,6 @@ if __name__ == "__main__":
         X = X.reshape([-1, OUT_HEIGHT, OUT_WIDTH, 1])
         Y = Y_train[0]
         Yp = model.predict([X])
-        print("Test Network")
         print(Y)
         print(Yp)
         print(Y-Yp)
@@ -214,3 +213,4 @@ if __name__ == "__main__":
     #print(model.predict(X_train))
 
     #model.save(model_name)
+    
