@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 base:
-	docker build -t uw_rc_car:latest -t uw_rc_car:base -f docker/Dockerfile.Base .
+	docker build -t uw_rc_car:latest -t ghcr.io/rvsagar/uw-auto-rc-car/uw_rc_car:base -f docker/Dockerfile.Base .
 
 tf:
 	docker build -t uw_rc_car:latest -t ghcr.io/rvsagar/uw-auto-rc-car/uw_rc_car:tf -f docker/Dockerfile.Tensorflow .
@@ -19,6 +19,10 @@ nvidia:
 # ======
 # DEPLOY
 # ======
+
+push-base: base
+	docker push ghcr.io/rvsagar/uw-auto-rc-car/uw_rc_car:base
+	
 push-tf-cpu: tf-cpu
 	docker push ghcr.io/rvsagar/uw-auto-rc-car/uw_rc_car:tf-cpu
 
