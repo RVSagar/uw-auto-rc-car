@@ -169,7 +169,7 @@ if __name__ == "__main__":
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=int(settings['epochs']/20))
     mc = ModelCheckpoint(model_name, monitor='val_loss', mode='min', verbose='1')
 
-    if os.path.exists(model_name) and settings['load_latest']:
+    if os.path.exists(model) and settings['load_latest']:
         model = keras.models.load_model(model_name)
 
         X = X_train[0]
